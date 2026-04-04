@@ -1,0 +1,9 @@
+{
+  "name": "legalflow-frontend",
+  "version": "1.0.0",
+  "description": "LegalFlow India – Premium Law Firm Case Management Frontend",
+  "scripts": {
+    "start": "npx serve -s . -l 3001",
+    "dev": "npx serve -s . -l 3001"
+  }
+}
