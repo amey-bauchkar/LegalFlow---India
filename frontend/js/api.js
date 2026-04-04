@@ -174,6 +174,15 @@ class LegalFlowAPI {
     return this.put(`/tasks/${id}`, data);
   }
 
+  // ---- Users ----
+  async getUsers(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/users${qs ? '?' + qs : ''}`);
+  }
+  async getUser(id) {
+    return this.get(`/users/${id}`);
+  }
+
   // ---- Calendar ----
   async getCalendarEvents(params = {}) {
     const qs = new URLSearchParams(params).toString();

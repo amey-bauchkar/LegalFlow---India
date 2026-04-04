@@ -16,7 +16,7 @@ const caseSchema = new mongoose.Schema({
   caseNumber: { type: String, required: [true, 'Case number is required'], unique: true, trim: true },
   diaryNumber: { type: String, default: '' },
   title: { type: String, required: [true, 'Case title is required'], trim: true },
-  client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+  client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client' },
   clientName: { type: String, default: '' },
   courtKey: { type: String, default: '' },
   courtName: { type: String, default: '' },

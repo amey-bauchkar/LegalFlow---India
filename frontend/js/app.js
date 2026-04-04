@@ -19,105 +19,16 @@ const COURTS = { SC:'Supreme Court of India', BHC:'Bombay High Court', DHC:'Delh
 const COURT_TYPES = { SC:'Supreme Court', BHC:'High Court', DHC:'High Court', DCMUM:'District Court', DCDEL:'District Court', DCHYD:'District Court' };
 
 // ============================================================
-// SECTION 2: DATA (loaded from API)
+// SECTION 2: DATA (loaded from API – initially empty)
 // ============================================================
-let clients = [
-  { id:'CLT001', name:'Reliance Industries Ltd.', contact:'Mukesh Ambani', email:'legal@reliance.com', phone:'+91 22 3555 5000', address:'Maker Chambers IV, Nariman Point, Mumbai 400021', type:'Corporate', industry:'Conglomerate', gst:'27AAACR5055K1ZR', pan:'AAACR5055K', activeCases:3, totalBilled:4500000, status:'Active' },
-  { id:'CLT002', name:'Infosys Limited', contact:'Salil Parekh', email:'legal@infosys.com', phone:'+91 80 2852 0261', address:'Electronics City, Hosur Road, Bangalore 560100', type:'Corporate', industry:'IT Services', gst:'29AABCI1234K1Z5', pan:'AABCI1234K', activeCases:2, totalBilled:2800000, status:'Active' },
-  { id:'CLT003', name:'Tata Consultancy Services', contact:'K Krithivasan', email:'legal@tcs.com', phone:'+91 22 6778 9999', address:'TCS House, Raveline Street, Mumbai 400001', type:'Corporate', industry:'IT Services', gst:'27AABCT1234K1ZS', pan:'AABCT1234K', activeCases:2, totalBilled:3200000, status:'Active' },
-  { id:'CLT004', name:'Adani Group', contact:'Gautam Adani', email:'legal@adani.com', phone:'+91 79 2555 7500', address:'Adani House, Nr. Mithakhali, Ahmedabad 380009', type:'Corporate', industry:'Infrastructure', gst:'24AABCA1234K1ZM', pan:'AABCA1234K', activeCases:2, totalBilled:5200000, status:'Active' },
-  { id:'CLT005', name:'Arun Mehta', contact:'Arun Mehta', email:'arun.mehta@gmail.com', phone:'+91 98765 43210', address:'45-B, Bandra West, Mumbai 400050', type:'Individual', industry:'Personal', gst:null, pan:'ABCPM1234L', activeCases:1, totalBilled:350000, status:'Active' },
-  { id:'CLT006', name:'Priya Sharma', contact:'Priya Sharma', email:'priya.sharma@outlook.com', phone:'+91 99887 66554', address:'12, Vasant Vihar, New Delhi 110057', type:'Individual', industry:'Personal', gst:null, pan:'ABCPS5678M', activeCases:1, totalBilled:175000, status:'Active' },
-  { id:'CLT007', name:'Wipro Limited', contact:'Thierry Delaporte', email:'legal@wipro.com', phone:'+91 80 2844 0011', address:'Doddakannelli, Sarjapur Road, Bangalore 560035', type:'Corporate', industry:'IT Services', gst:'29AABCW1234K1Z3', pan:'AABCW1234K', activeCases:1, totalBilled:1800000, status:'Active' },
-  { id:'CLT008', name:'Bajaj Auto Ltd.', contact:'Rajiv Bajaj', email:'legal@bajajauto.com', phone:'+91 20 6610 6000', address:'Akurdi, Pune 411035', type:'Corporate', industry:'Automotive', gst:'27AABCB1234K1Z8', pan:'AABCB1234K', activeCases:1, totalBilled:920000, status:'Active' }
-];
+let clients = [];
+let cases = [];
+let documents = [];
+let invoices = [];
+let tasks = [];
+let calendarEvents = [];
+let users = [];
 
-let cases = [
-  { id:'CASE001', caseNumber:'WP(C) 1234/2025', diaryNumber:'D-45678/2025', title:'Reliance Industries vs. Union of India', clientId:'CLT001', clientName:'Reliance Industries Ltd.', courtKey:'SC', court:COURTS.SC, bench:'Division Bench – Justice D.Y. Chandrachud, Justice J.B. Pardiwala', opposingParty:'Union of India', advocate:'Adv. Rajesh Kumar', filingType:'Writ Petition (Civil)', status:'Active', priority:'Critical', matterStage:4, filingDate:'2024-08-15', registrationDate:'2024-08-20', nextHearingDate:'2026-04-04', lastOrderDate:'2026-03-18', filingDeadline:'2026-04-10', lastHearingOutcome:'Evidence recording partially completed. Next date for cross-examination.', causeListRef:'Cause List No. 52, Item 8, Court No. 3', nextActionDate:'2026-04-03', adjournmentHistory:[{date:'2025-12-15',reason:'Bench not available due to Constitution Bench hearing',nextDate:'2026-01-20'},{date:'2026-01-20',reason:'Advocate for respondent sought adjournment for preparation',nextDate:'2026-02-15'},{date:'2026-02-15',reason:'Court proceedings adjourned due to judges conference',nextDate:'2026-03-18'}], timeline:[{date:'2024-08-15',type:'Filing',description:'Writ Petition filed before Supreme Court'},{date:'2024-08-20',type:'Registration',description:'Case registered and diary number assigned'},{date:'2024-09-10',type:'Hearing',description:'Admission hearing – case admitted for hearing'},{date:'2024-11-05',type:'Order',description:'Written statement directed to be filed within 30 days'},{date:'2025-01-15',type:'Filing',description:'Written statement filed by respondent'},{date:'2025-04-20',type:'Stage',description:'Matter moved to Evidence stage'},{date:'2025-12-15',type:'Adjournment',description:'Bench not available'},{date:'2026-01-20',type:'Adjournment',description:'Respondent sought adjournment'},{date:'2026-03-18',type:'Hearing',description:'Cross-examination of PW-1 partially completed'}], description:'Constitutional challenge regarding regulatory framework applicability to conglomerate operations across multiple sectors.', billingType:'Milestone-Based', totalBilled:2400000, totalPaid:1600000 },
-  { id:'CASE002', caseNumber:'CS(OS) 567/2025', diaryNumber:'D-12345/2025', title:'Infosys Ltd. vs. DataTech Solutions', clientId:'CLT002', clientName:'Infosys Limited', courtKey:'DHC', court:COURTS.DHC, bench:'Single Bench – Justice Vibhu Bakhru', opposingParty:'DataTech Solutions Pvt. Ltd.', advocate:'Adv. Priya Nair', filingType:'Commercial Suit', status:'Active', priority:'High', matterStage:2, filingDate:'2025-06-10', registrationDate:'2025-06-15', nextHearingDate:'2026-04-08', lastOrderDate:'2026-03-22', filingDeadline:'2026-04-15', lastHearingOutcome:'Written statement filed. Replication to be filed within 30 days.', causeListRef:'Cause List No. 38, Item 14, Court No. 7', nextActionDate:'2026-04-07', adjournmentHistory:[{date:'2026-02-10',reason:'Plaintiff counsel not available',nextDate:'2026-03-22'}], timeline:[{date:'2025-06-10',type:'Filing',description:'Commercial suit filed for IP infringement'},{date:'2025-06-15',type:'Registration',description:'Suit registered at Delhi High Court'},{date:'2025-07-20',type:'Hearing',description:'Summons issued to defendant'},{date:'2025-09-15',type:'Order',description:'Case admitted. Written statement directed within 30 days.'},{date:'2026-02-10',type:'Adjournment',description:'Counsel not available'},{date:'2026-03-22',type:'Hearing',description:'Written statement filed and accepted'}], description:'Intellectual property dispute concerning proprietary software algorithms and trade secrets.', billingType:'Hourly', totalBilled:1400000, totalPaid:1000000 },
-  { id:'CASE003', caseNumber:'WP 2345/2024', diaryNumber:'D-67890/2024', title:'TCS vs. Maharashtra State Tax Authority', clientId:'CLT003', clientName:'Tata Consultancy Services', courtKey:'BHC', court:COURTS.BHC, bench:'Division Bench – Justice G.S. Patel, Justice Neela Gokhale', opposingParty:'State of Maharashtra (Tax Dept.)', advocate:'Adv. Suresh Iyer', filingType:'Writ Petition', status:'Active', priority:'High', matterStage:5, filingDate:'2024-03-20', registrationDate:'2024-03-25', nextHearingDate:'2026-04-12', lastOrderDate:'2026-03-25', filingDeadline:'2026-04-20', lastHearingOutcome:'Arguments of petitioner concluded. Respondent to argue on next date.', causeListRef:'Cause List No. 44, Item 3, Court No. 1', nextActionDate:'2026-04-11', adjournmentHistory:[{date:'2026-01-15',reason:'State counsel sought time for instructions',nextDate:'2026-02-20'},{date:'2026-02-20',reason:'Part-heard matter carried forward',nextDate:'2026-03-25'}], timeline:[{date:'2024-03-20',type:'Filing',description:'WP filed challenging GST demand of ₹45 Cr'},{date:'2024-03-25',type:'Registration',description:'Registered at Bombay High Court'},{date:'2024-05-10',type:'Hearing',description:'Admission hearing – interim stay granted'},{date:'2024-08-15',type:'Order',description:'Written statement directed'},{date:'2025-02-10',type:'Stage',description:'Evidence stage completed'},{date:'2025-10-15',type:'Stage',description:'Arguments commenced'},{date:'2026-03-25',type:'Hearing',description:'Petitioner arguments concluded'}], description:'Challenge to GST assessment order demanding ₹45 Crores. Involves interpretation of input tax credit provisions under CGST Act.', billingType:'Fixed Fee', totalBilled:2000000, totalPaid:2000000 },
-  { id:'CASE004', caseNumber:'ARB.P. 789/2025', diaryNumber:'D-23456/2025', title:'Adani Ports vs. Global Shipping Corp.', clientId:'CLT004', clientName:'Adani Group', courtKey:'BHC', court:COURTS.BHC, bench:'Single Bench – Justice B.P. Colabawalla', opposingParty:'Global Shipping Corporation Ltd.', advocate:'Adv. Meera Desai', filingType:'Arbitration Petition', status:'Active', priority:'Critical', matterStage:3, filingDate:'2025-02-14', registrationDate:'2025-02-18', nextHearingDate:'2026-04-05', lastOrderDate:'2026-03-20', filingDeadline:'2026-04-08', lastHearingOutcome:'Written statements exchanged. List of documents directed within 2 weeks.', causeListRef:'Cause List No. 41, Item 6, Court No. 5', nextActionDate:'2026-04-04', adjournmentHistory:[], timeline:[{date:'2025-02-14',type:'Filing',description:'Arbitration petition filed under Section 11'},{date:'2025-02-18',type:'Registration',description:'Registered and numbered'},{date:'2025-04-10',type:'Hearing',description:'Arbitrator appointed by consent'},{date:'2025-08-20',type:'Order',description:'Statement of claim filed'},{date:'2026-01-15',type:'Stage',description:'Written statements exchanged'},{date:'2026-03-20',type:'Hearing',description:'List of documents directed'}], description:'Commercial arbitration dispute relating to port handling charges and force majeure claims. Claim value: ₹120 Crores.', billingType:'Event-Based', totalBilled:3500000, totalPaid:2500000 },
-  { id:'CASE005', caseNumber:'CS 123/2024', diaryNumber:'D-34567/2024', title:'Arun Mehta vs. Heritage Properties', clientId:'CLT005', clientName:'Arun Mehta', courtKey:'DCMUM', court:COURTS.DCMUM, bench:'Civil Judge, Senior Division – Court No. 12', opposingParty:'Heritage Properties Pvt. Ltd.', advocate:'Adv. Amit Sharma', filingType:'Civil Suit', status:'Active', priority:'Medium', matterStage:1, filingDate:'2024-11-10', registrationDate:'2024-11-15', nextHearingDate:'2026-04-15', lastOrderDate:'2026-03-10', filingDeadline:'2026-04-25', lastHearingOutcome:'Summons served on defendant. Appearance directed on next date.', causeListRef:'Cause List, Court No. 12, Sr. No. 23', nextActionDate:'2026-04-14', adjournmentHistory:[{date:'2026-02-05',reason:'Service of summons pending',nextDate:'2026-03-10'}], timeline:[{date:'2024-11-10',type:'Filing',description:'Suit for specific performance of sale agreement'},{date:'2024-11-15',type:'Registration',description:'Registered at District Court, Mumbai'},{date:'2025-01-20',type:'Hearing',description:'Summons issued'},{date:'2026-02-05',type:'Adjournment',description:'Summons not served'},{date:'2026-03-10',type:'Hearing',description:'Summons served. Next for admission.'}], description:'Suit for specific performance of agreement to sell property at Bandra, Mumbai.', billingType:'Fixed Fee', totalBilled:250000, totalPaid:150000 },
-  { id:'CASE006', caseNumber:'CRL.MC 456/2025', diaryNumber:'D-78901/2025', title:'Priya Sharma vs. State of Delhi', clientId:'CLT006', clientName:'Priya Sharma', courtKey:'DCDEL', court:COURTS.DCDEL, bench:'Metropolitan Magistrate – Court No. 8', opposingParty:'State of NCT Delhi', advocate:'Adv. Kavita Reddy', filingType:'Criminal Miscellaneous', status:'Active', priority:'High', matterStage:3, filingDate:'2025-04-05', registrationDate:'2025-04-08', nextHearingDate:'2026-04-18', lastOrderDate:'2026-03-28', filingDeadline:'2026-04-22', lastHearingOutcome:'Evidence of prosecution being recorded. PW-2 examined.', causeListRef:'Cause List, Court No. 8, Sr. No. 15', nextActionDate:'2026-04-17', adjournmentHistory:[{date:'2026-03-05',reason:'Prosecution witness not available',nextDate:'2026-03-28'}], timeline:[{date:'2025-04-05',type:'Filing',description:'Criminal miscellaneous petition filed'},{date:'2025-04-08',type:'Registration',description:'Case registered'},{date:'2025-06-15',type:'Hearing',description:'Charges framed'},{date:'2025-09-20',type:'Stage',description:'Evidence stage commenced'},{date:'2026-03-05',type:'Adjournment',description:'PW not available'},{date:'2026-03-28',type:'Hearing',description:'PW-2 examined'}], description:'Quashing petition under Section 482 CrPC. Cheque bounce under Section 138 NI Act. Amount: ₹15 Lakhs.', billingType:'Retainership', totalBilled:175000, totalPaid:120000 },
-  { id:'CASE007', caseNumber:'WP(C) 890/2025', diaryNumber:'D-56789/2025', title:'Reliance Jio vs. TRAI', clientId:'CLT001', clientName:'Reliance Industries Ltd.', courtKey:'SC', court:COURTS.SC, bench:'Division Bench – Justice Surya Kant, Justice Dipankar Datta', opposingParty:'TRAI & Others', advocate:'Adv. Rajesh Kumar', filingType:'Writ Petition (Civil)', status:'Active', priority:'High', matterStage:2, filingDate:'2025-09-01', registrationDate:'2025-09-05', nextHearingDate:'2026-04-20', lastOrderDate:'2026-03-15', filingDeadline:'2026-04-28', lastHearingOutcome:'Case admitted. Counter affidavit directed within 4 weeks.', causeListRef:'Cause List No. 55, Item 12, Court No. 6', nextActionDate:'2026-04-19', adjournmentHistory:[], timeline:[{date:'2025-09-01',type:'Filing',description:'Challenge to TRAI regulation on tariff framework'},{date:'2025-09-05',type:'Registration',description:'Registered at Supreme Court'},{date:'2025-11-10',type:'Hearing',description:'Admission hearing – case admitted'},{date:'2026-03-15',type:'Order',description:'Counter affidavit directed within 4 weeks'}], description:'Challenge to TRAI regulatory framework on telecom tariff structure.', billingType:'Hourly', totalBilled:900000, totalPaid:600000 },
-  { id:'CASE008', caseNumber:'TA 234/2025', diaryNumber:'D-89012/2025', title:'Infosys vs. Income Tax Department', clientId:'CLT002', clientName:'Infosys Limited', courtKey:'BHC', court:COURTS.BHC, bench:'Income Tax Appellate Tribunal – Bench B', opposingParty:'Deputy CIT, Circle 1(1)', advocate:'Adv. Suresh Iyer', filingType:'Tax Appeal', status:'Active', priority:'Medium', matterStage:5, filingDate:'2025-01-20', registrationDate:'2025-01-25', nextHearingDate:'2026-04-22', lastOrderDate:'2026-03-30', filingDeadline:'2026-05-01', lastHearingOutcome:'Arguments of appellant partially heard.', causeListRef:'Cause List – ITAT Bench B, Sr. No. 5', nextActionDate:'2026-04-21', adjournmentHistory:[{date:'2026-03-01',reason:'Tribunal adjourned for administrative reasons',nextDate:'2026-03-30'}], timeline:[{date:'2025-01-20',type:'Filing',description:'Tax appeal filed against assessment order'},{date:'2025-01-25',type:'Registration',description:'Appeal registered at ITAT'},{date:'2025-05-10',type:'Hearing',description:'Preliminary hearing'},{date:'2025-08-20',type:'Stage',description:'Evidence completed'},{date:'2026-03-01',type:'Adjournment',description:'Tribunal adjourned'},{date:'2026-03-30',type:'Hearing',description:'Arguments partially heard'}], description:'Appeal against income tax assessment order for AY 2023-24. Demand: ₹230 Crores.', billingType:'Fixed Fee', totalBilled:1400000, totalPaid:1400000 },
-  { id:'CASE009', caseNumber:'SLP(C) 5678/2025', diaryNumber:'D-90123/2025', title:'Adani Power vs. CERC', clientId:'CLT004', clientName:'Adani Group', courtKey:'SC', court:COURTS.SC, bench:'Division Bench – Justice B.R. Gavai, Justice Aravind Kumar', opposingParty:'Central Electricity Regulatory Commission', advocate:'Adv. Meera Desai', filingType:'Special Leave Petition (Civil)', status:'Active', priority:'Critical', matterStage:1, filingDate:'2025-11-15', registrationDate:'2025-11-20', nextHearingDate:'2026-04-06', lastOrderDate:'2026-03-22', filingDeadline:'2026-04-12', lastHearingOutcome:'Notice issued. Tagged with connected matters.', causeListRef:'Cause List No. 50, Item 2, Court No. 2', nextActionDate:'2026-04-05', adjournmentHistory:[], timeline:[{date:'2025-11-15',type:'Filing',description:'SLP filed against APTEL order on tariff determination'},{date:'2025-11-20',type:'Registration',description:'Registered at Supreme Court'},{date:'2026-01-10',type:'Hearing',description:'Notice issued to respondents'},{date:'2026-03-22',type:'Order',description:'Tagged with connected matters for hearing'}], description:'Challenge to CERC tariff order. Financial impact: ₹800 Crores.', billingType:'Milestone-Based', totalBilled:1700000, totalPaid:1000000 },
-  { id:'CASE010', caseNumber:'CS(COMM) 345/2024', diaryNumber:'D-45670/2024', title:'TCS vs. ByteWorks Technologies', clientId:'CLT003', clientName:'Tata Consultancy Services', courtKey:'BHC', court:COURTS.BHC, bench:'Commercial Division – Justice R.I. Chagla', opposingParty:'ByteWorks Technologies Ltd.', advocate:'Adv. Rajesh Kumar', filingType:'Commercial Suit', status:'Active', priority:'Medium', matterStage:4, filingDate:'2024-06-01', registrationDate:'2024-06-05', nextHearingDate:'2026-04-25', lastOrderDate:'2026-03-28', filingDeadline:'2026-05-05', lastHearingOutcome:'Chief examination of PW-1 completed.', causeListRef:'Cause List – Commercial Division, Sr. No. 10', nextActionDate:'2026-04-24', adjournmentHistory:[{date:'2025-11-20',reason:'Witness not available',nextDate:'2026-01-15'},{date:'2026-01-15',reason:'Court functioning disrupted due to strike',nextDate:'2026-02-20'}], timeline:[{date:'2024-06-01',type:'Filing',description:'Commercial suit for breach of service agreement'},{date:'2024-06-05',type:'Registration',description:'Suit registered at Bombay HC Commercial Division'},{date:'2024-09-10',type:'Hearing',description:'Written statement filed by defendant'},{date:'2025-03-15',type:'Stage',description:'Evidence stage commenced'},{date:'2025-11-20',type:'Adjournment',description:'Witness not available'},{date:'2026-03-28',type:'Hearing',description:'PW-1 chief examination completed'}], description:'Breach of master service agreement. Damages claimed: ₹50 Crores.', billingType:'Hourly', totalBilled:1200000, totalPaid:800000 },
-  { id:'CASE011', caseNumber:'WP 678/2025', diaryNumber:'D-67891/2025', title:'Wipro vs. Karnataka IT Dept.', clientId:'CLT007', clientName:'Wipro Limited', courtKey:'BHC', court:'Karnataka High Court', bench:'Single Bench – Justice M. Nagaprasanna', opposingParty:'State of Karnataka (IT Department)', advocate:'Adv. Kavita Reddy', filingType:'Writ Petition', status:'Active', priority:'Medium', matterStage:3, filingDate:'2025-05-20', registrationDate:'2025-05-25', nextHearingDate:'2026-04-28', lastOrderDate:'2026-03-18', filingDeadline:'2026-05-10', lastHearingOutcome:'Counter filed by state. Rejoinder directed within 3 weeks.', causeListRef:'Cause List No. 32, Item 18, Court No. 4', nextActionDate:'2026-04-27', adjournmentHistory:[], timeline:[{date:'2025-05-20',type:'Filing',description:'WP challenging IT incentive withdrawal'},{date:'2025-05-25',type:'Registration',description:'Registered at Karnataka HC'},{date:'2025-08-10',type:'Hearing',description:'Interim order – status quo maintained'},{date:'2026-03-18',type:'Hearing',description:'Counter filed. Rejoinder directed.'}], description:'Challenge to withdrawal of IT sector incentives by Karnataka government.', billingType:'Retainership', totalBilled:1800000, totalPaid:1500000 },
-  { id:'CASE012', caseNumber:'RCS 901/2024', diaryNumber:'D-90124/2024', title:'Bajaj Auto vs. SpeedParts India', clientId:'CLT008', clientName:'Bajaj Auto Ltd.', courtKey:'DCMUM', court:COURTS.DCMUM, bench:'Civil Judge – Court No. 6', opposingParty:'SpeedParts India Pvt. Ltd.', advocate:'Adv. Amit Sharma', filingType:'Regular Civil Suit', status:'Active', priority:'Low', matterStage:6, filingDate:'2024-02-10', registrationDate:'2024-02-15', nextHearingDate:'2026-05-02', lastOrderDate:'2026-03-25', filingDeadline:'2026-05-15', lastHearingOutcome:'Final arguments of plaintiff concluded.', causeListRef:'Cause List, Court No. 6, Sr. No. 8', nextActionDate:'2026-05-01', adjournmentHistory:[{date:'2026-02-15',reason:'Part heard – insufficient time',nextDate:'2026-03-25'}], timeline:[{date:'2024-02-10',type:'Filing',description:'Suit for trademark infringement and passing off'},{date:'2024-02-15',type:'Registration',description:'Case registered'},{date:'2024-05-20',type:'Hearing',description:'Written statement filed'},{date:'2024-10-10',type:'Stage',description:'Evidence completed'},{date:'2025-06-15',type:'Stage',description:'Arguments commenced'},{date:'2025-12-20',type:'Stage',description:'Final hearing stage'},{date:'2026-03-25',type:'Hearing',description:'Plaintiff arguments concluded'}], description:'Trademark infringement suit. Seeking permanent injunction and damages of ₹5 Crores.', billingType:'Fixed Fee', totalBilled:920000, totalPaid:920000 },
-  { id:'CASE013', caseNumber:'EP 456/2024', diaryNumber:'D-45671/2024', title:'Reliance Retail vs. QuickMart', clientId:'CLT001', clientName:'Reliance Industries Ltd.', courtKey:'DHC', court:COURTS.DHC, bench:'Single Bench – Justice C. Hari Shankar', opposingParty:'QuickMart Retail Pvt. Ltd.', advocate:'Adv. Priya Nair', filingType:'Execution Petition', status:'Pending', priority:'Medium', matterStage:7, filingDate:'2024-07-15', registrationDate:'2024-07-20', nextHearingDate:'2026-04-30', lastOrderDate:'2026-03-12', filingDeadline:'2026-05-10', lastHearingOutcome:'Order reserved. Judgment awaited.', causeListRef:'Cause List No. 35, Item 20, Court No. 9', nextActionDate:'2026-04-29', adjournmentHistory:[], timeline:[{date:'2024-07-15',type:'Filing',description:'Execution petition filed for decree enforcement'},{date:'2024-07-20',type:'Registration',description:'EP registered at Delhi HC'},{date:'2024-12-10',type:'Hearing',description:'Objections to execution heard'},{date:'2025-06-20',type:'Stage',description:'Arguments completed'},{date:'2026-03-12',type:'Order',description:'Order reserved after final hearing'}], description:'Execution of commercial court decree. ₹18 Crores damages.', billingType:'Event-Based', totalBilled:800000, totalPaid:500000 }
-];
-
-let documents = [
-  { id:'DOC001', caseId:'CASE001', title:'Vakalatnama – Supreme Court', type:'Vakalatnama', category:'Legal Authority', uploadDate:'2024-08-14', size:'245 KB', status:'Verified', uploadedBy:'Adv. Rajesh Kumar' },
-  { id:'DOC002', caseId:'CASE001', title:'Writ Petition with Annexures', type:'Petition', category:'Court Filing', uploadDate:'2024-08-15', size:'2.1 MB', status:'Filed', uploadedBy:'Adv. Rajesh Kumar' },
-  { id:'DOC003', caseId:'CASE001', title:'Affidavit in Support', type:'Affidavit', category:'Court Filing', uploadDate:'2024-08-15', size:'1.8 MB', status:'Filed', uploadedBy:'Adv. Rajesh Kumar' },
-  { id:'DOC004', caseId:'CASE002', title:'Power of Attorney', type:'Power of Attorney', category:'Legal Authority', uploadDate:'2025-06-09', size:'180 KB', status:'Verified', uploadedBy:'Adv. Priya Nair' },
-  { id:'DOC005', caseId:'CASE002', title:'IP Assignment Agreement', type:'Evidence Document', category:'Evidence', uploadDate:'2025-07-15', size:'3.5 MB', status:'Uploaded', uploadedBy:'Legal Team' },
-  { id:'DOC006', caseId:'CASE003', title:'GST Assessment Order', type:'GST Filing Attachment', category:'Tax Document', uploadDate:'2024-03-19', size:'5.2 MB', status:'Verified', uploadedBy:'Adv. Suresh Iyer' },
-  { id:'DOC007', caseId:'CASE003', title:'Vakalatnama – Bombay HC', type:'Vakalatnama', category:'Legal Authority', uploadDate:'2024-03-19', size:'210 KB', status:'Filed', uploadedBy:'Adv. Suresh Iyer' },
-  { id:'DOC008', caseId:'CASE004', title:'Arbitration Agreement', type:'Evidence Document', category:'Contract', uploadDate:'2025-02-13', size:'890 KB', status:'Verified', uploadedBy:'Adv. Meera Desai' },
-  { id:'DOC009', caseId:'CASE005', title:'Sale Agreement', type:'Sale Deed', category:'Property Document', uploadDate:'2024-11-09', size:'1.2 MB', status:'Verified', uploadedBy:'Adv. Amit Sharma' },
-  { id:'DOC010', caseId:'CASE005', title:'Aadhaar Card – Arun Mehta', type:'Aadhaar Copy', category:'Identity Document', uploadDate:'2024-11-09', size:'320 KB', status:'Verified', uploadedBy:'Client' },
-  { id:'DOC011', caseId:'CASE005', title:'PAN Card – Arun Mehta', type:'PAN Copy', category:'Identity Document', uploadDate:'2024-11-09', size:'150 KB', status:'Verified', uploadedBy:'Client' },
-  { id:'DOC012', caseId:'CASE006', title:'Rent Agreement', type:'Rent Agreement', category:'Property Document', uploadDate:'2025-04-04', size:'680 KB', status:'Uploaded', uploadedBy:'Adv. Kavita Reddy' },
-  { id:'DOC013', caseId:'CASE006', title:'Bounced Cheque Copy', type:'Evidence Document', category:'Evidence', uploadDate:'2025-04-04', size:'420 KB', status:'Verified', uploadedBy:'Client' },
-  { id:'DOC014', caseId:'CASE004', title:'Port Handling Agreement', type:'Evidence Document', category:'Contract', uploadDate:'2025-02-14', size:'4.5 MB', status:'Filed', uploadedBy:'Adv. Meera Desai' },
-  { id:'DOC015', caseId:'CASE009', title:'SLP Memo of Parties', type:'Petition', category:'Court Filing', uploadDate:'2025-11-15', size:'560 KB', status:'Filed', uploadedBy:'Adv. Meera Desai' },
-  { id:'DOC016', caseId:'CASE010', title:'Master Service Agreement', type:'Evidence Document', category:'Contract', uploadDate:'2024-06-01', size:'2.8 MB', status:'Verified', uploadedBy:'Legal Team' },
-  { id:'DOC017', caseId:'CASE007', title:'Counter Affidavit – TRAI', type:'Counter Affidavit', category:'Court Filing', uploadDate:'2026-03-15', size:'1.9 MB', status:'Pending Review', uploadedBy:'Respondent' },
-  { id:'DOC018', caseId:'CASE008', title:'Tax Assessment Order AY23-24', type:'GST Filing Attachment', category:'Tax Document', uploadDate:'2025-01-19', size:'3.8 MB', status:'Verified', uploadedBy:'Adv. Suresh Iyer' },
-  { id:'DOC019', caseId:'CASE011', title:'SEZ Notification', type:'Evidence Document', category:'Government Document', uploadDate:'2025-05-19', size:'1.1 MB', status:'Uploaded', uploadedBy:'Legal Team' },
-  { id:'DOC020', caseId:'CASE012', title:'Trademark Registration Certificate', type:'Evidence Document', category:'IP Document', uploadDate:'2024-02-09', size:'450 KB', status:'Verified', uploadedBy:'Adv. Amit Sharma' },
-  { id:'DOC021', caseId:'CASE001', title:'Written Statement by UoI', type:'Written Statement', category:'Court Filing', uploadDate:'2025-01-15', size:'2.4 MB', status:'Filed', uploadedBy:'Respondent' },
-  { id:'DOC022', caseId:'CASE003', title:'Compliance Report Q3-2025', type:'Compliance Report', category:'Regulatory', uploadDate:'2025-10-01', size:'1.5 MB', status:'Uploaded', uploadedBy:'Legal Team' },
-  { id:'DOC023', caseId:'CASE013', title:'Decree Copy', type:'Court Order', category:'Court Filing', uploadDate:'2024-07-14', size:'780 KB', status:'Verified', uploadedBy:'Adv. Priya Nair' }
-];
-
-let invoices = [
-  { id:'INV001', caseId:'CASE001', clientId:'CLT001', clientName:'Reliance Industries Ltd.', invoiceNumber:'LF/2025-26/001', date:'2026-03-01', dueDate:'2026-03-31', amount:600000, gst:108000, total:708000, status:'Paid', billingType:'Milestone-Based', description:'Milestone 3 – Evidence stage completion', paidDate:'2026-03-15' },
-  { id:'INV002', caseId:'CASE001', clientId:'CLT001', clientName:'Reliance Industries Ltd.', invoiceNumber:'LF/2025-26/002', date:'2026-03-15', dueDate:'2026-04-14', amount:600000, gst:108000, total:708000, status:'Pending', billingType:'Milestone-Based', description:'Milestone 4 – Arguments preparation', paidDate:null },
-  { id:'INV003', caseId:'CASE002', clientId:'CLT002', clientName:'Infosys Limited', invoiceNumber:'LF/2025-26/003', date:'2026-02-01', dueDate:'2026-03-03', amount:400000, gst:72000, total:472000, status:'Overdue', billingType:'Hourly', description:'80 hours @ ₹5,000/hr – Feb 2026', paidDate:null },
-  { id:'INV004', caseId:'CASE003', clientId:'CLT003', clientName:'Tata Consultancy Services', invoiceNumber:'LF/2025-26/004', date:'2026-01-15', dueDate:'2026-02-14', amount:500000, gst:90000, total:590000, status:'Paid', billingType:'Fixed Fee', description:'Phase 2 – Arguments stage', paidDate:'2026-02-10' },
-  { id:'INV005', caseId:'CASE004', clientId:'CLT004', clientName:'Adani Group', invoiceNumber:'LF/2025-26/005', date:'2026-03-20', dueDate:'2026-04-19', amount:1000000, gst:180000, total:1180000, status:'Pending', billingType:'Event-Based', description:'Arbitrator appointment & Statement of claim filing', paidDate:null },
-  { id:'INV006', caseId:'CASE005', clientId:'CLT005', clientName:'Arun Mehta', invoiceNumber:'LF/2025-26/006', date:'2025-12-01', dueDate:'2025-12-31', amount:100000, gst:18000, total:118000, status:'Overdue', billingType:'Fixed Fee', description:'Retainer – Nov & Dec 2025', paidDate:null },
-  { id:'INV007', caseId:'CASE006', clientId:'CLT006', clientName:'Priya Sharma', invoiceNumber:'LF/2025-26/007', date:'2026-03-01', dueDate:'2026-03-31', amount:55000, gst:9900, total:64900, status:'Pending', billingType:'Retainership', description:'Monthly retainer – March 2026', paidDate:null },
-  { id:'INV008', caseId:'CASE009', clientId:'CLT004', clientName:'Adani Group', invoiceNumber:'LF/2025-26/008', date:'2026-02-15', dueDate:'2026-03-17', amount:700000, gst:126000, total:826000, status:'Overdue', billingType:'Milestone-Based', description:'Milestone 1 – SLP filing and admission', paidDate:null },
-  { id:'INV009', caseId:'CASE010', clientId:'CLT003', clientName:'Tata Consultancy Services', invoiceNumber:'LF/2025-26/009', date:'2026-03-25', dueDate:'2026-04-24', amount:400000, gst:72000, total:472000, status:'Pending', billingType:'Hourly', description:'80 hours @ ₹5,000/hr – March 2026', paidDate:null },
-  { id:'INV010', caseId:'CASE011', clientId:'CLT007', clientName:'Wipro Limited', invoiceNumber:'LF/2025-26/010', date:'2026-03-01', dueDate:'2026-03-31', amount:300000, gst:54000, total:354000, status:'Paid', billingType:'Retainership', description:'Quarterly retainer Q1-2026', paidDate:'2026-03-28' },
-  { id:'INV011', caseId:'CASE012', clientId:'CLT008', clientName:'Bajaj Auto Ltd.', invoiceNumber:'LF/2025-26/011', date:'2026-01-10', dueDate:'2026-02-09', amount:200000, gst:36000, total:236000, status:'Paid', billingType:'Fixed Fee', description:'Final arguments stage billing', paidDate:'2026-02-05' },
-  { id:'INV012', caseId:'CASE007', clientId:'CLT001', clientName:'Reliance Industries Ltd.', invoiceNumber:'LF/2025-26/012', date:'2026-03-10', dueDate:'2026-04-09', amount:300000, gst:54000, total:354000, status:'Pending', billingType:'Hourly', description:'60 hours @ ₹5,000/hr – TRAI matter', paidDate:null }
-];
-
-let tasks = [
-  { id:'TSK001', caseId:'CASE001', title:'Prepare cross-examination brief for PW-2', assignee:'Adv. Rajesh Kumar', dueDate:'2026-04-03', status:'In Progress', priority:'Critical' },
-  { id:'TSK002', caseId:'CASE002', title:'Draft replication to written statement', assignee:'Adv. Priya Nair', dueDate:'2026-04-15', status:'Pending', priority:'High' },
-  { id:'TSK003', caseId:'CASE004', title:'Compile list of documents for arbitration', assignee:'Adv. Meera Desai', dueDate:'2026-04-04', status:'In Progress', priority:'Critical' },
-  { id:'TSK004', caseId:'CASE003', title:'Prepare rejoinder arguments', assignee:'Adv. Suresh Iyer', dueDate:'2026-04-11', status:'Pending', priority:'High' },
-  { id:'TSK005', caseId:'CASE005', title:'Follow up on summons service status', assignee:'Adv. Amit Sharma', dueDate:'2026-04-14', status:'Pending', priority:'Medium' },
-  { id:'TSK006', caseId:'CASE006', title:'Prepare defense arguments for NI Act', assignee:'Adv. Kavita Reddy', dueDate:'2026-04-17', status:'Not Started', priority:'High' },
-  { id:'TSK007', caseId:'CASE009', title:'File counter to CERC response', assignee:'Adv. Meera Desai', dueDate:'2026-04-05', status:'In Progress', priority:'Critical' },
-  { id:'TSK008', caseId:'CASE010', title:'Prepare witness for cross-examination', assignee:'Adv. Rajesh Kumar', dueDate:'2026-04-24', status:'Not Started', priority:'Medium' },
-  { id:'TSK009', caseId:'CASE007', title:'Review TRAI counter affidavit', assignee:'Adv. Rajesh Kumar', dueDate:'2026-04-19', status:'Pending', priority:'High' },
-  { id:'TSK010', caseId:'CASE003', title:'Submit GST compliance report', assignee:'Legal Team', dueDate:'2026-03-28', status:'Overdue', priority:'Critical' }
-];
-
-let calendarEvents = [
-  { id:'EVT001', caseId:'CASE001', title:'Hearing – Reliance vs. UoI', date:'2026-04-04', time:'10:30 AM', court:COURTS.SC, type:'Hearing', priority:'Critical' },
-  { id:'EVT002', caseId:'CASE004', title:'Hearing – Adani Ports Arbitration', date:'2026-04-05', time:'11:00 AM', court:COURTS.BHC, type:'Hearing', priority:'Critical' },
-  { id:'EVT003', caseId:'CASE009', title:'Hearing – Adani Power vs. CERC', date:'2026-04-06', time:'10:00 AM', court:COURTS.SC, type:'Hearing', priority:'Critical' },
-  { id:'EVT004', caseId:'CASE002', title:'Hearing – Infosys vs. DataTech', date:'2026-04-08', time:'02:00 PM', court:COURTS.DHC, type:'Hearing', priority:'High' },
-  { id:'EVT005', caseId:'CASE003', title:'Hearing – TCS vs. Maha Tax', date:'2026-04-12', time:'10:30 AM', court:COURTS.BHC, type:'Hearing', priority:'High' },
-  { id:'EVT006', caseId:'CASE005', title:'Hearing – Mehta Property Suit', date:'2026-04-15', time:'11:30 AM', court:COURTS.DCMUM, type:'Hearing', priority:'Medium' },
-  { id:'EVT007', caseId:'CASE006', title:'Hearing – Priya NI Act Matter', date:'2026-04-18', time:'02:30 PM', court:COURTS.DCDEL, type:'Hearing', priority:'High' },
-  { id:'EVT008', caseId:'CASE007', title:'Hearing – Jio vs. TRAI', date:'2026-04-20', time:'10:00 AM', court:COURTS.SC, type:'Hearing', priority:'High' },
-  { id:'EVT009', caseId:'CASE008', title:'Hearing – Infosys Tax Appeal', date:'2026-04-22', time:'11:00 AM', court:COURTS.BHC, type:'Hearing', priority:'Medium' },
-  { id:'EVT010', caseId:null, title:'GST Filing Deadline – Q4 FY26', date:'2026-04-30', time:'All Day', court:null, type:'Deadline', priority:'High' },
-  { id:'EVT011', caseId:'CASE010', title:'Hearing – TCS vs. ByteWorks', date:'2026-04-25', time:'10:30 AM', court:COURTS.BHC, type:'Hearing', priority:'Medium' },
-  { id:'EVT012', caseId:null, title:'Bar Council Meeting', date:'2026-04-10', time:'04:00 PM', court:null, type:'Meeting', priority:'Low' },
-  { id:'EVT013', caseId:'CASE001', title:'Filing Deadline – Evidence Documents', date:'2026-04-10', time:'EOD', court:COURTS.SC, type:'Deadline', priority:'Critical' },
-  { id:'EVT014', caseId:'CASE004', title:'Filing Deadline – Document List', date:'2026-04-08', time:'EOD', court:COURTS.BHC, type:'Deadline', priority:'Critical' }
-];
 
 // ============================================================
 // SECTION 3: UTILITY FUNCTIONS
@@ -131,11 +42,13 @@ const getPriorityBg = (p) => ({Critical:'priority-critical',High:'priority-high'
 const getActiveCases = () => cases.filter(c => c.status === 'Active');
 const getUpcomingHearings = (n=7) => calendarEvents.filter(e => e.type==='Hearing' && daysUntil(e.date)>=0 && daysUntil(e.date)<=n).sort((a,b)=>new Date(a.date)-new Date(b.date));
 const getOverdueInvoices = () => invoices.filter(i => i.status === 'Overdue');
-const getTotalRevenue = () => invoices.filter(i => i.status==='Paid').reduce((s,i) => s+i.total, 0);
-const getTotalOutstanding = () => invoices.filter(i => i.status!=='Paid').reduce((s,i) => s+i.total, 0);
+const getTotalRevenue = () => invoices.filter(i => i.status==='Paid').reduce((s,i) => s+(i.total||0), 0);
+const getTotalOutstanding = () => invoices.filter(i => i.status!=='Paid').reduce((s,i) => s+(i.total||0), 0);
 const getDocumentsForCase = (id) => documents.filter(d => d.caseId===id);
 const getTasksForCase = (id) => tasks.filter(t => t.caseId===id);
 const getInvoicesForCase = (id) => invoices.filter(i => i.caseId===id);
+const getUserRole = () => window.__lfUser ? window.__lfUser.role : 'lawyer';
+const isAdmin = () => getUserRole() === 'admin';
 
 const getAIInsight = () => {
   const ot = tasks.filter(t=>t.status==='Overdue');
@@ -748,20 +661,147 @@ const DashboardPage = () => {
 // ============================================================
 // SECTION 9: CASES LIST
 // ============================================================
+// Add Case Modal
+const AddCaseModal = ({ onClose, onCreated }) => {
+  const [form, setForm] = useState({ title: '', caseNumber: '', courtName: '', stage: 0, nextHearingDate: '', client: '', priority: 'Medium', status: 'Active', advocate: '' });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const currentUser = window.__lfUser;
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  const lawyerUsers = useMemo(() => users.filter(u => u.role === 'lawyer'), []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(''); setSaving(true);
+    const payload = { ...form };
+    // Set courtKey from courtName
+    const courtKey = Object.keys(COURTS).find(k => COURTS[k] === form.courtName);
+    if (courtKey) payload.courtKey = courtKey;
+    // If client is selected, set clientName too
+    const cl = clients.find(c => c.id === form.client || c._id === form.client);
+    if (cl) payload.clientName = cl.name;
+    // Advocate name
+    if (form.advocate) {
+      const adv = users.find(u => (u.id || u._id) === form.advocate);
+      if (adv) payload.advocateName = adv.name;
+    }
+    const res = await window.lfAPI.createCase(payload);
+    if (res.success) {
+      await reloadCases();
+      onCreated();
+      onClose();
+    } else {
+      setError(res.message || 'Failed to create case.');
+    }
+    setSaving(false);
+  };
+
+  return React.createElement(motion.div, {
+    className: 'fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm',
+    initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 },
+    onClick: (e) => { if (e.target === e.currentTarget) onClose(); }
+  },
+    React.createElement(motion.div, {
+      className: 'glass-card p-8 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto',
+      initial: { opacity: 0, scale: 0.95, y: 20 }, animate: { opacity: 1, scale: 1, y: 0 },
+      transition: { duration: 0.35, ease: [0.22,1,0.36,1] },
+      onClick: e => e.stopPropagation()
+    },
+      React.createElement('div', { className: 'relative z-10' },
+        React.createElement('div', { className: 'flex items-center justify-between mb-6' },
+          React.createElement('h2', { className: 'text-xl font-bold text-white tracking-tight' }, 'Add New Case'),
+          React.createElement(motion.div, { className: 'w-8 h-8 rounded-lg glass-inner flex items-center justify-center cursor-pointer text-surface-500 hover:text-white transition-colors',
+            onClick: onClose, whileHover: { scale: 1.1 }, whileTap: { scale: 0.9 } },
+            React.createElement('i', { className: 'fas fa-times text-[12px]' })
+          )
+        ),
+        error && React.createElement(motion.div, { className: 'mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[13px]',
+          initial: { opacity: 0 }, animate: { opacity: 1 } }, React.createElement('i', { className: 'fas fa-exclamation-circle mr-2' }), error),
+        React.createElement('form', { onSubmit: handleSubmit, className: 'space-y-4' },
+          // Case Title
+          React.createElement('div', null,
+            React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Case Title *'),
+            React.createElement('input', { type: 'text', required: true, value: form.title, onChange: e => setForm({...form, title: e.target.value}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]', placeholder: 'e.g. ABC Corp vs. XYZ Ltd.' })
+          ),
+          // Case Number
+          React.createElement('div', null,
+            React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Case Number *'),
+            React.createElement('input', { type: 'text', required: true, value: form.caseNumber, onChange: e => setForm({...form, caseNumber: e.target.value}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]', placeholder: 'e.g. WP(C) 123/2026' })
+          ),
+          // Client
+          React.createElement('div', null,
+            React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Client *'),
+            React.createElement('select', { required: true, value: form.client, onChange: e => setForm({...form, client: e.target.value}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]' },
+              React.createElement('option', { value: '' }, 'Select a client...'),
+              clients.map(c => React.createElement('option', { key: c.id || c._id, value: c.id || c._id }, c.name))
+            )
+          ),
+          // Court Name
+          React.createElement('div', null,
+            React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Court Name *'),
+            React.createElement('select', { required: true, value: form.courtName, onChange: e => setForm({...form, courtName: e.target.value}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]' },
+              React.createElement('option', { value: '' }, 'Select a court...'),
+              Object.values(COURTS).map(c => React.createElement('option', { key: c, value: c }, c))
+            )
+          ),
+          // Two columns: Stage + Priority
+          React.createElement('div', { className: 'grid grid-cols-2 gap-4' },
+            React.createElement('div', null,
+              React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Stage'),
+              React.createElement('select', { value: form.stage, onChange: e => setForm({...form, stage: Number(e.target.value)}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]' },
+                MATTER_STAGES.map((s, i) => React.createElement('option', { key: i, value: i }, s))
+              )
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Priority'),
+              React.createElement('select', { value: form.priority, onChange: e => setForm({...form, priority: e.target.value}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]' },
+                ['Critical', 'High', 'Medium', 'Low'].map(p => React.createElement('option', { key: p, value: p }, p))
+              )
+            )
+          ),
+          // Advocate (admin can assign, lawyer auto-assigns)
+          isAdmin && React.createElement('div', null,
+            React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Assign Advocate'),
+            React.createElement('select', { value: form.advocate, onChange: e => setForm({...form, advocate: e.target.value}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]' },
+              React.createElement('option', { value: '' }, 'Auto-assign (self)'),
+              lawyerUsers.map(u => React.createElement('option', { key: u.id || u._id, value: u.id || u._id }, u.name))
+            )
+          ),
+          // Next Hearing Date
+          React.createElement('div', null,
+            React.createElement('label', { className: 'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5' }, 'Next Hearing Date'),
+            React.createElement('input', { type: 'date', value: form.nextHearingDate, onChange: e => setForm({...form, nextHearingDate: e.target.value}), className: 'w-full py-2.5 px-4 rounded-xl text-[13px]' })
+          ),
+          // Submit
+          React.createElement('div', { className: 'flex items-center gap-3 pt-3' },
+            React.createElement('button', { type: 'submit', disabled: saving, className: `btn-primary py-2.5 px-6 text-[13px] flex-1 ${saving ? 'opacity-60 cursor-wait' : ''}` },
+              saving ? React.createElement('span', null, React.createElement('i', { className: 'fas fa-circle-notch fa-spin mr-2' }), 'Creating...') :
+              React.createElement('span', null, React.createElement('i', { className: 'fas fa-plus mr-2' }), 'Create Case')
+            ),
+            React.createElement('button', { type: 'button', onClick: onClose, className: 'btn-ghost py-2.5 px-6 text-[13px]' }, 'Cancel')
+          )
+        )
+      )
+    )
+  );
+};
+
 const CasesPage = () => {
   const [filter,setFilter]=useState('All');
   const [search,setSearch]=useState('');
   const [sortBy,setSortBy]=useState('nextHearing');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const {navigate}=useRouter();
   const filtered=useMemo(()=>{
     let r=cases;
     if(filter!=='All') r=r.filter(c=>c.priority===filter||c.status===filter);
-    if(search){const s=search.toLowerCase(); r=r.filter(c=>c.title.toLowerCase().includes(s)||c.caseNumber.toLowerCase().includes(s)||c.clientName.toLowerCase().includes(s)||c.court.toLowerCase().includes(s));}
-    if(sortBy==='nextHearing') r=[...r].sort((a,b)=>new Date(a.nextHearingDate)-new Date(b.nextHearingDate));
-    if(sortBy==='priority'){const o={Critical:0,High:1,Medium:2,Low:3}; r=[...r].sort((a,b)=>o[a.priority]-o[b.priority]);}
-    if(sortBy==='name') r=[...r].sort((a,b)=>a.title.localeCompare(b.title));
+    if(search){const s=search.toLowerCase(); r=r.filter(c=>(c.title||'').toLowerCase().includes(s)||(c.caseNumber||'').toLowerCase().includes(s)||(c.clientName||'').toLowerCase().includes(s)||(c.court||'').toLowerCase().includes(s));}
+    if(sortBy==='nextHearing') r=[...r].sort((a,b)=>new Date(a.nextHearingDate||0)-new Date(b.nextHearingDate||0));
+    if(sortBy==='priority'){const o={Critical:0,High:1,Medium:2,Low:3}; r=[...r].sort((a,b)=>(o[a.priority]||9)-(o[b.priority]||9));}
+    if(sortBy==='name') r=[...r].sort((a,b)=>(a.title||'').localeCompare(b.title||''));
     return r;
-  },[filter,search,sortBy]);
+  },[filter,search,sortBy,refreshKey]);
   const opts=['All','Active','Pending','Critical','High','Medium','Low'];
 
   return React.createElement('div',{className:'space-y-6'},
@@ -774,7 +814,11 @@ const CasesPage = () => {
         opts.map(f=>React.createElement('button',{key:f,className:`tab-btn ${filter===f?'active':''}`,onClick:()=>setFilter(f)},f))
       ),
       React.createElement('select',{className:'rounded-[11px] text-[13px] py-[8px]',value:sortBy,onChange:e=>setSortBy(e.target.value)},
-        React.createElement('option',{value:'nextHearing'},'Next Hearing'),React.createElement('option',{value:'priority'},'Priority'),React.createElement('option',{value:'name'},'Name'))
+        React.createElement('option',{value:'nextHearing'},'Next Hearing'),React.createElement('option',{value:'priority'},'Priority'),React.createElement('option',{value:'name'},'Name')),
+      React.createElement(motion.div, { role: 'button', className: 'btn-primary text-[13px] px-4 py-[8px] flex items-center gap-2', onClick: () => setShowAddModal(true),
+        whileHover: { scale: 1.03 }, whileTap: { scale: 0.97 } },
+        React.createElement('i', { className: 'fas fa-plus text-[11px]' }), 'Add Case'
+      )
     ),
     React.createElement(FadeIn,{delay:0.08,className:'text-[12px] text-surface-500 font-medium'},`Showing ${filtered.length} of ${cases.length} cases`),
 
@@ -844,7 +888,9 @@ const CasesPage = () => {
         )
       )
     ),
-    filtered.length===0 && React.createElement(EmptyState,{icon:'fa-briefcase',title:'No cases found',subtitle:'Try adjusting your search criteria or filters to find what you need.'})
+    filtered.length===0 && React.createElement(EmptyState,{icon:'fa-briefcase',title:'No cases found',subtitle:'Try adjusting your search criteria or filters to find what you need.'}),
+    // Add Case Modal
+    showAddModal && React.createElement(AddCaseModal, { onClose: () => setShowAddModal(false), onCreated: () => setRefreshKey(k => k + 1) })
   );
 };
 
@@ -1523,54 +1569,68 @@ const ExpenseTrackingPage = () => {
 // SECTION 14.3: TEAM COLLABORATION (NEW)
 // ============================================================
 const TeamPage = () => {
-  // Dummy data for firm members
-  const teamMembers = [
-    { id: 'USR001', name: 'Adv. Rajesh Kumar', role: 'Senior Partner', email: 'rajesh.k@legalflow.in', phone: '+91 98765 12345', cases: 14, status: 'Active', initials: 'RK', color: 'from-indigo-500 to-purple-600' },
-    { id: 'USR002', name: 'Adv. Priya Nair', role: 'Partner', email: 'priya.n@legalflow.in', phone: '+91 98765 23456', cases: 9, status: 'Active', initials: 'PN', color: 'from-indigo-500 to-purple-600' },
-    { id: 'USR003', name: 'Adv. Suresh Iyer', role: 'Senior Associate', email: 'suresh.i@legalflow.in', phone: '+91 98765 34567', cases: 11, status: 'In Court', initials: 'SI', color: 'from-emerald-500 to-teal-600' },
-    { id: 'USR004', name: 'Adv. Meera Desai', role: 'Associate', email: 'meera.d@legalflow.in', phone: '+91 98765 45678', cases: 6, status: 'Active', initials: 'MD', color: 'from-blue-500 to-cyan-600' },
-    { id: 'USR005', name: 'Adv. Amit Sharma', role: 'Associate', email: 'amit.s@legalflow.in', phone: '+91 98765 56789', cases: 5, status: 'On Leave', initials: 'AS', color: 'from-blue-500 to-cyan-600' },
-    { id: 'USR006', name: 'Kavita Reddy', role: 'Paralegal', email: 'kavita.r@legalflow.in', phone: '+91 98765 67890', cases: 18, status: 'Active', initials: 'KR', color: 'from-amber-500 to-orange-600' }
-  ];
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('All');
+  const currentUser = window.__lfUser;
+  const isAdmin = currentUser && currentUser.role === 'admin';
+
+  // Use global users array loaded from API
+  const teamMembers = useMemo(() => {
+    let filtered = users;
+    if (roleFilter !== 'All') filtered = filtered.filter(u => u.role === roleFilter);
+    if (search) {
+      const s = search.toLowerCase();
+      filtered = filtered.filter(u => u.name.toLowerCase().includes(s) || u.email.toLowerCase().includes(s) || (u.designation || '').toLowerCase().includes(s));
+    }
+    return filtered;
+  }, [search, roleFilter]);
+
+  const admins = useMemo(() => users.filter(u => u.role === 'admin'), []);
+  const lawyers = useMemo(() => users.filter(u => u.role === 'lawyer'), []);
+  const getInitials = (name) => name ? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '??';
+  const getColor = (role) => role === 'admin' ? 'from-indigo-500 to-purple-600' : 'from-blue-500 to-cyan-600';
 
   return React.createElement('div', { className: 'space-y-6' },
     // Top Controls
     React.createElement(FadeUp, { className: 'flex justify-between items-center flex-wrap gap-4' },
       React.createElement('div', { className: 'relative max-w-sm w-full' },
         React.createElement('i', { className: 'fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-surface-600 text-[11px]' }),
-        React.createElement('input', { type: 'text', placeholder: 'Search team members...', className: 'w-full pl-8 pr-3 py-[8px] rounded-[11px] text-[13px]' })
+        React.createElement('input', { type: 'text', placeholder: 'Search team members...', className: 'w-full pl-8 pr-3 py-[8px] rounded-[11px] text-[13px]', value: search, onChange: e => setSearch(e.target.value) })
       ),
-      React.createElement('button', { className: 'btn-primary' }, React.createElement('i', { className: 'fas fa-user-plus mr-2' }), 'Invite Member')
+      React.createElement('div', { className: 'tab-bar' },
+        ['All', 'admin', 'lawyer'].map(f => React.createElement('button', { key: f, className: `tab-btn ${roleFilter === f ? 'active' : ''}`, onClick: () => setRoleFilter(f) }, f === 'All' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1) + 's'))
+      )
     ),
 
     // Quick Stats
-    React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-4 gap-4' },
-      React.createElement(MetricCard, { icon: 'fa-users', iconBg: 'bg-indigo-500/10 text-indigo-400', label: 'Total Firm Members', value: 6, delay: 0.1 }),
-      React.createElement(MetricCard, { icon: 'fa-user-tie', iconBg: 'bg-purple-500/10 text-purple-400', label: 'Partners', value: 2, delay: 0.15 }),
-      React.createElement(MetricCard, { icon: 'fa-scale-balanced', iconBg: 'bg-blue-500/10 text-blue-400', label: 'Associates', value: 3, delay: 0.2 }),
-      React.createElement(MetricCard, { icon: 'fa-file-signature', iconBg: 'bg-amber-500/10 text-amber-400', label: 'Paralegals', value: 1, delay: 0.25 })
+    React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-3 gap-4' },
+      React.createElement(MetricCard, { icon: 'fa-users', iconBg: 'bg-indigo-500/10 text-indigo-400', label: 'Total Firm Members', value: users.length, delay: 0.1 }),
+      React.createElement(MetricCard, { icon: 'fa-user-shield', iconBg: 'bg-purple-500/10 text-purple-400', label: 'Admins', value: admins.length, delay: 0.15 }),
+      React.createElement(MetricCard, { icon: 'fa-user-tie', iconBg: 'bg-blue-500/10 text-blue-400', label: 'Lawyers', value: lawyers.length, delay: 0.2 })
     ),
 
     // Team Grid
+    teamMembers.length === 0 ?
+      React.createElement(EmptyState, { icon: 'fa-users', title: 'No team members found', subtitle: 'Try adjusting your search or filters.' }) :
     React.createElement(Stagger, { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5', staggerDelay: 0.05, delayStart: 0.3 },
-      teamMembers.map((member) => React.createElement(StaggerItem, { key: member.id },
+      teamMembers.map((member) => React.createElement(StaggerItem, { key: member.id || member._id },
         React.createElement(motion.div, { 
-          className: 'glass-card p-6 h-full flex flex-col cursor-pointer group',
+          className: 'glass-card p-6 h-full flex flex-col cursor-default group',
           whileHover: { y: -4, borderColor: 'rgba(99,102,241,0.2)', boxShadow: '0 20px 40px -15px rgba(99,102,241,0.15)' }
         },
           // Header: Avatar & Name
           React.createElement('div', { className: 'flex items-start justify-between mb-4' },
             React.createElement('div', { className: 'flex items-center gap-4' },
-              React.createElement('div', { className: `w-12 h-12 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/10` }, member.initials),
+              React.createElement('div', { className: `w-12 h-12 rounded-2xl bg-gradient-to-br ${getColor(member.role)} flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/10` }, getInitials(member.name)),
               React.createElement('div', null,
                 React.createElement('h3', { className: 'text-[15px] font-semibold text-white tracking-tight' }, member.name),
-                React.createElement('span', { className: 'text-[11px] text-surface-400 font-medium' }, member.role)
+                React.createElement('span', { className: 'text-[11px] text-surface-400 font-medium' }, member.designation || (member.role === 'admin' ? 'Administrator' : 'Lawyer'))
               )
             ),
-            // Status Indicator
-            React.createElement('div', { className: 'flex items-center gap-1.5 bg-surface-900/50 px-2.5 py-1 rounded-md' },
-              React.createElement('div', { className: `w-1.5 h-1.5 rounded-full ${member.status === 'Active' ? 'bg-emerald-400' : member.status === 'In Court' ? 'bg-purple-400 animate-pulse' : 'bg-surface-500'}` }),
-              React.createElement('span', { className: 'text-[9px] font-medium text-surface-300 uppercase tracking-wide' }, member.status)
+            // Role Badge
+            React.createElement('div', { className: `flex items-center gap-1.5 px-2.5 py-1 rounded-md ${member.role === 'admin' ? 'bg-indigo-500/10' : 'bg-blue-500/10'}` },
+              React.createElement('div', { className: `w-1.5 h-1.5 rounded-full ${member.role === 'admin' ? 'bg-indigo-400' : 'bg-blue-400'}` }),
+              React.createElement('span', { className: 'text-[9px] font-medium text-surface-300 uppercase tracking-wide' }, member.role)
             )
           ),
           
@@ -1580,23 +1640,31 @@ const TeamPage = () => {
               React.createElement('i', { className: 'fas fa-envelope text-[10px] w-3 text-center opacity-70' }),
               React.createElement('span', { className: 'truncate hover:text-indigo-300 transition-colors' }, member.email)
             ),
-            React.createElement('div', { className: 'flex items-center gap-2.5 text-[12px] text-surface-400' },
+            member.phone && React.createElement('div', { className: 'flex items-center gap-2.5 text-[12px] text-surface-400' },
               React.createElement('i', { className: 'fas fa-phone text-[10px] w-3 text-center opacity-70' }),
               React.createElement('span', null, member.phone)
+            ),
+            React.createElement('div', { className: 'flex items-center gap-2.5 text-[12px] text-surface-400' },
+              React.createElement('i', { className: 'fas fa-calendar-plus text-[10px] w-3 text-center opacity-70' }),
+              React.createElement('span', null, 'Joined ', formatDate(member.createdAt))
             )
           ),
 
-          // Footer: Active Cases & Action
+          // Footer: Active Cases
           React.createElement('div', { className: 'pt-4 border-t border-white/[0.04] flex items-center justify-between' },
             React.createElement('div', null,
-              React.createElement('span', { className: 'block text-[10px] text-surface-500 font-medium mb-0.5' }, 'Active Cases'),
-              React.createElement('div', { className: 'flex items-center gap-1.5' },
-                React.createElement('i', { className: 'fas fa-briefcase text-[10px] text-indigo-400' }),
-                React.createElement('span', { className: 'text-[14px] font-bold text-white' }, member.cases)
+              React.createElement('span', { className: 'block text-[10px] text-surface-500 font-medium mb-0.5' }, 'Assigned Cases'),
+              React.createElement('div', { className: 'flex items-center gap-3' },
+                React.createElement('div', { className: 'flex items-center gap-1.5' },
+                  React.createElement('i', { className: 'fas fa-briefcase text-[10px] text-indigo-400' }),
+                  React.createElement('span', { className: 'text-[14px] font-bold text-white' }, member.totalCases || 0)
+                ),
+                React.createElement('span', { className: 'text-[10px] text-surface-600' }, '|'),
+                React.createElement('div', { className: 'flex items-center gap-1' },
+                  React.createElement('span', { className: 'text-[11px] text-emerald-400 font-semibold' }, member.activeCases || 0),
+                  React.createElement('span', { className: 'text-[10px] text-surface-500' }, 'active')
+                )
               )
-            ),
-            React.createElement('button', { className: 'text-[11px] text-indigo-300 font-semibold group-hover:text-indigo-400 transition-colors flex items-center gap-1' },
-              'View Profile', React.createElement('i', { className: 'fas fa-arrow-right text-[9px] group-hover:translate-x-0.5 transition-transform' })
             )
           )
         )
@@ -1762,13 +1830,14 @@ const normalizeArray = (arr) => (arr || []).map(normalizeRecord);
 // Load all data from API into global arrays
 const loadAllData = async () => {
   try {
-    const [casesRes, clientsRes, docsRes, invoicesRes, tasksRes, eventsRes] = await Promise.all([
+    const [casesRes, clientsRes, docsRes, invoicesRes, tasksRes, eventsRes, usersRes] = await Promise.all([
       window.lfAPI.getCases({ limit: 100 }),
       window.lfAPI.getClients({ limit: 100 }),
       window.lfAPI.getDocuments({ limit: 100 }),
       window.lfAPI.getInvoices({ limit: 100 }),
       window.lfAPI.getTasks({ limit: 100 }),
-      window.lfAPI.getCalendarEvents({ limit: 200 })
+      window.lfAPI.getCalendarEvents({ limit: 200 }),
+      window.lfAPI.getUsers({ limit: 100 })
     ]);
     if (casesRes.success) cases = normalizeArray(casesRes.data);
     if (clientsRes.success) clients = normalizeArray(clientsRes.data);
@@ -1776,11 +1845,28 @@ const loadAllData = async () => {
     if (invoicesRes.success) invoices = normalizeArray(invoicesRes.data);
     if (tasksRes.success) tasks = normalizeArray(tasksRes.data);
     if (eventsRes.success) calendarEvents = normalizeArray(eventsRes.data);
+    if (usersRes.success) users = normalizeArray(usersRes.data);
     return true;
   } catch (err) {
     console.error('Failed to load data:', err);
     return false;
   }
+};
+
+// Reload just cases (after create/update)
+const reloadCases = async () => {
+  try {
+    const res = await window.lfAPI.getCases({ limit: 100 });
+    if (res.success) cases = normalizeArray(res.data);
+  } catch (err) { console.error('Failed to reload cases:', err); }
+};
+
+// Reload just users (after signup)
+const reloadUsers = async () => {
+  try {
+    const res = await window.lfAPI.getUsers({ limit: 100 });
+    if (res.success) users = normalizeArray(res.data);
+  } catch (err) { console.error('Failed to reload users:', err); }
 };
 
 // ---- LOGIN SCREEN ----
