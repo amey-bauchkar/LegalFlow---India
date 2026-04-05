@@ -11,6 +11,9 @@ const documentSchema = new mongoose.Schema({
   fileSize: { type: String, default: '' },
   status: { type: String, enum: ['Verified', 'Filed', 'Uploaded', 'Pending Review'], default: 'Uploaded' },
   uploadDate: { type: Date, default: Date.now },
+  signedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  signedByName: { type: String, default: '' },
+  signedAt: { type: Date },
   createdAt: { type: Date, default: Date.now }
 });
 

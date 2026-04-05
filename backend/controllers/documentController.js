@@ -18,10 +18,13 @@ exports.getDocuments = asyncHandler(async (req, res) => {
   if (status) filter.status = status;
   if (caseId) filter.caseId = caseId;
 
-  // Lawyer: only show docs for their cases
+  // Role-based filtering
   if (req.user.role === 'lawyer') {
     const lawyerCases = await Case.find({ advocate: req.user._id }).select('_id');
     filter.caseId = { $in: lawyerCases.map(c => c._id) };
+  } else if (req.user.role === 'client') {
+    const clientCases = await Case.find({ client: req.user.linkedClientId }).select('_id');
+    filter.caseId = { $in: clientCases.map(c => c._id) };
   }
 
   let sortObj = { uploadDate: -1 };
@@ -83,4 +86,27 @@ exports.deleteDocument = asyncHandler(async (req, res) => {
   if (!doc) return res.status(404).json({ success: false, message: 'Document not found.' });
   await Document.findByIdAndDelete(req.params.id);
   res.json({ success: true, message: 'Document deleted.', data: null });
+});
+
+// PUT /api/documents/:id/sign - Simulated e-signature
+exports.signDocument = asyncHandler(async (req, res) => {
+  const doc = await Document.findById(req.params.id);
+  if (!doc) return res.status(404).json({ success: false, message: 'Document not found.' });
+
+  doc.signedBy = req.user._id;
+  doc.signedByName = req.user.name;
+  doc.signedAt = new Date();
+  doc.status = 'Verified';
+  await doc.save();
+
+  // Audit log
+  const AuditLog = require('../models/AuditLog');
+  await AuditLog.create({
+    action: 'sign', entity: 'document', entityId: doc._id,
+    entityTitle: doc.title,
+    userId: req.user._id, userName: req.user.name, userRole: req.user.role,
+    details: `E-signed document: ${doc.title}`
+  });
+
+  res.json({ success: true, message: 'Document signed successfully.', data: doc });
 });

@@ -13,14 +13,16 @@ exports.signup = asyncHandler(async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ success: false, message: errors.array().map(e => e.msg).join('. '), data: null });
   }
-  const { name, email, password, role, phone, designation } = req.body;
+  const { name, email, password, role, phone, designation, linkedClientId } = req.body;
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return res.status(400).json({ success: false, message: 'Email already registered.', data: null });
   }
 
-  const user = await User.create({ name, email, password, role: role || 'lawyer', phone, designation });
+  const userData = { name, email, password, role: role || 'lawyer', phone, designation };
+  if (role === 'client' && linkedClientId) userData.linkedClientId = linkedClientId;
+  const user = await User.create(userData);
   const token = generateToken(user._id);
 
   res.status(201).json({

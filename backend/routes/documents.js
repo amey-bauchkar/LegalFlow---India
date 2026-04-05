@@ -1,5 +1,5 @@
 const express = require('express');
-const { getDocuments, uploadDocument, getDocument, deleteDocument } = require('../controllers/documentController');
+const { getDocuments, uploadDocument, getDocument, deleteDocument, signDocument } = require('../controllers/documentController');
 const { protect } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
@@ -15,5 +15,8 @@ router.post('/upload', upload.single('file'), uploadDocument);
 router.route('/:id')
   .get(getDocument)
   .delete(deleteDocument);
+
+router.route('/:id/sign')
+  .put(signDocument);
 
 module.exports = router;

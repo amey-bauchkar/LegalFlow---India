@@ -38,6 +38,11 @@ app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/calendar', require('./routes/calendar'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/messages', require('./routes/messages'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/audit-logs', require('./routes/auditLogs'));
+app.use('/api/document-requests', require('./routes/documentRequests'));
+app.use('/api/workflow', require('./routes/workflow'));
 
 // Health check
 app.get('/api/health', (req, res) => {

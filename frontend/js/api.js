@@ -93,8 +93,8 @@ class LegalFlowAPI {
   }
 
   // ---- Auth ----
-  async signup(name, email, password, role) {
-    return this.post('/auth/signup', { name, email, password, role });
+  async signup(name, email, password, role, linkedClientId) {
+    return this.post('/auth/signup', { name, email, password, role, linkedClientId });
   }
   async login(email, password) {
     return this.post('/auth/login', { email, password });
@@ -149,6 +149,9 @@ class LegalFlowAPI {
   async uploadDocument(formData) {
     return this.uploadFile('/documents/upload', formData);
   }
+  async signDocument(id) {
+    return this.put(`/documents/${id}/sign`, {});
+  }
 
   // ---- Invoices ----
   async getInvoices(params = {}) {
@@ -193,6 +196,56 @@ class LegalFlowAPI {
   }
   async updateCalendarEvent(id, data) {
     return this.put(`/calendar/${id}`, data);
+  }
+
+  // ---- Messages ----
+  async getMessages(caseId, params = {}) {
+    const qs = new URLSearchParams({ caseId, ...params }).toString();
+    return this.get(`/messages?${qs}`);
+  }
+  async sendMessage(caseId, text) {
+    return this.post('/messages', { caseId, text });
+  }
+
+  // ---- Notifications ----
+  async getNotifications(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/notifications${qs ? '?' + qs : ''}`);
+  }
+  async getUnreadCount() {
+    return this.get('/notifications/unread-count');
+  }
+  async markNotificationRead(id) {
+    return this.put(`/notifications/${id}/read`, {});
+  }
+  async markAllNotificationsRead() {
+    return this.put('/notifications/read-all', {});
+  }
+
+  // ---- Audit Logs ----
+  async getAuditLogs(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/audit-logs${qs ? '?' + qs : ''}`);
+  }
+
+  // ---- Document Requests ----
+  async getDocumentRequests(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    return this.get(`/document-requests${qs ? '?' + qs : ''}`);
+  }
+  async createDocumentRequest(data) {
+    return this.post('/document-requests', data);
+  }
+  async updateDocumentRequest(id, data) {
+    return this.put(`/document-requests/${id}`, data);
+  }
+
+  // ---- Workflow ----
+  async getWorkflowAlerts() {
+    return this.get('/workflow/alerts');
+  }
+  async generateNotifications() {
+    return this.post('/workflow/generate-notifications', {});
   }
 }
 
