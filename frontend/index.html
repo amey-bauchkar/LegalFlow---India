@@ -381,53 +381,105 @@
         .px-7 { padding-left: 1rem !important; padding-right: 1rem !important; }
       }
 
-      /* ===== DARK/LIGHT MODE ===== */
-      html.light body { background: #f4f6fb; color: #1e293b; }
+      /* ===== DARK/LIGHT MODE – STRICT LIGHT VARIABLES ===== */
+      html.light {
+        --bg-primary: #ffffff;
+        --bg-secondary: #f8fafc;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --card-bg: #ffffff;
+        --border: #e2e8f0;
+      }
+      html.light body { background: var(--bg-secondary); color: var(--text-primary); }
       html.light .bg-aurora, html.light .bg-noise, html.light .bg-grid-subtle,
       html.light .bg-glow-orb1, html.light .bg-glow-orb2 { display: none; }
       html.light .glass-panel {
-        background: rgba(255,255,255,0.95);
-        border-color: rgba(0,0,0,0.06);
+        background: var(--bg-primary);
+        border-color: var(--border);
         backdrop-filter: blur(20px);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       }
       html.light .glass-card, html.light .glass-card-flat {
-        background: linear-gradient(155deg, rgba(255,255,255,0.95), rgba(248,250,252,0.8));
-        border-color: rgba(0,0,0,0.06);
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
       }
+      html.light .glass-card::before, html.light .glass-card-flat::before { display: none; }
       html.light .glass-card:hover {
-        border-color: rgba(99,102,241,0.25);
-        box-shadow: 0 20px 40px -15px rgba(99,102,241,0.1), 0 4px 12px rgba(0,0,0,0.06);
+        border-color: rgba(99,102,241,0.35);
+        box-shadow: 0 10px 25px -8px rgba(99,102,241,0.12), 0 4px 10px rgba(0,0,0,0.06);
       }
       html.light .glass-inner {
-        background: rgba(241,245,249,0.8);
-        border-color: rgba(0,0,0,0.04);
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
       }
-      html.light .sidebar-link { color: #64748b; }
-      html.light .sidebar-link:hover { color: #1e293b; background: rgba(99,102,241,0.06); }
-      html.light .sidebar-link.active { color: #4f46e5; background: rgba(99,102,241,0.08); }
+      html.light .sidebar-link { color: var(--text-secondary); }
+      html.light .sidebar-link:hover { color: var(--text-primary); background: rgba(99,102,241,0.06); }
+      html.light .sidebar-link.active { color: #4f46e5; background: rgba(99,102,241,0.1); }
+      html.light .sidebar-link.active::before { background: linear-gradient(to bottom, #6366f1, #4f46e5); }
       html.light input, html.light select, html.light textarea {
-        background: rgba(255,255,255,0.9);
-        border-color: rgba(0,0,0,0.1);
-        color: #1e293b;
+        background: var(--bg-primary);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+      }
+      html.light input:focus, html.light select:focus, html.light textarea:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
       }
       html.light input::placeholder { color: #94a3b8; }
       html.light .premium-table thead th {
-        background: rgba(248,250,252,0.95);
-        color: #64748b;
-        border-color: rgba(0,0,0,0.06);
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
       }
-      html.light .premium-table tbody tr:hover { background: rgba(99,102,241,0.04); }
-      html.light .premium-table tbody tr { border-color: rgba(0,0,0,0.04); }
-      html.light .text-white { color: #1e293b !important; }
-      html.light .text-surface-200, html.light .text-surface-300 { color: #334155 !important; }
-      html.light .text-surface-400, html.light .text-surface-500 { color: #64748b !important; }
+      html.light .premium-table tbody tr:hover { background: rgba(99,102,241,0.03); }
+      html.light .premium-table tbody tr { border-bottom: 1px solid #f1f5f9; }
+      html.light .premium-table tbody td { color: var(--text-primary); }
+      html.light .text-white { color: var(--text-primary) !important; }
+      html.light .text-surface-200, html.light .text-surface-300 { color: #1e293b !important; }
+      html.light .text-surface-400 { color: #475569 !important; }
+      html.light .text-surface-500 { color: #64748b !important; }
       html.light .text-surface-600 { color: #94a3b8 !important; }
-      html.light .tab-bar { background: rgba(241,245,249,0.8); border-color: rgba(0,0,0,0.06); }
-      html.light .tab-btn.active { background: rgba(99,102,241,0.1); color: #4f46e5; }
-      html.light .btn-ghost { border-color: rgba(0,0,0,0.1); color: #475569; }
-      html.light .btn-ghost:hover { border-color: rgba(99,102,241,0.3); background: rgba(99,102,241,0.04); color: #1e293b; }
-      html.light ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.15); }
-      html.light .skeleton { background: linear-gradient(90deg, rgba(0,0,0,0.04) 25%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.04) 75%); }
+      html.light .text-surface-700 { color: #cbd5e1 !important; }
+      html.light .tab-bar { background: var(--bg-secondary); border: 1px solid var(--border); }
+      html.light .tab-btn { color: var(--text-secondary); }
+      html.light .tab-btn:hover { color: var(--text-primary); }
+      html.light .tab-btn.active { background: rgba(99,102,241,0.1); color: #4f46e5; box-shadow: 0 1px 3px rgba(99,102,241,0.1); }
+      html.light .btn-primary {
+        box-shadow: 0 2px 8px rgba(99,102,241,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+      }
+      html.light .btn-ghost { border-color: var(--border); color: var(--text-secondary); }
+      html.light .btn-ghost:hover { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.04); color: var(--text-primary); }
+      html.light ::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.2); }
+      html.light .skeleton { background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%); background-size: 200% 100%; }
+      /* Light mode badge overrides for readability */
+      html.light .badge-active { background: rgba(34,197,94,0.1); color: #16a34a; }
+      html.light .badge-pending { background: rgba(234,179,8,0.1); color: #b45309; }
+      html.light .badge-overdue { background: rgba(239,68,68,0.1); color: #dc2626; }
+      html.light .badge-paid { background: rgba(34,197,94,0.1); color: #16a34a; }
+      html.light .priority-critical { background: rgba(239,68,68,0.08); color: #dc2626; }
+      html.light .priority-high { background: rgba(249,115,22,0.08); color: #c2410c; }
+      html.light .priority-medium { background: rgba(234,179,8,0.08); color: #a16207; }
+      html.light .priority-low { background: rgba(34,197,94,0.08); color: #16a34a; }
+      /* Light mode sidebar & header borders */
+      html.light .border-white\/\[0\.035\] { border-color: var(--border) !important; }
+      html.light .border-white\/\[0\.03\] { border-color: #f1f5f9 !important; }
+      html.light .border-white\/\[0\.04\] { border-color: #f1f5f9 !important; }
+      html.light .border-white\/\[0\.02\] { border-color: #f8fafc !important; }
+      /* Light mode metric card text */
+      html.light .metric-shimmer::after { background: linear-gradient(90deg, transparent, rgba(99,102,241,0.03), transparent); }
+      /* Notification dropdown */
+      html.light .chat-float-btn { box-shadow: 0 8px 24px rgba(99,102,241,0.25), 0 0 0 4px rgba(99,102,241,0.08); }
+      /* Font-mono light readability */
+      html.light .font-mono { color: #4f46e5; }
+      html.light .text-indigo-300\/80 { color: #4f46e5 !important; }
+      html.light .text-indigo-300\/70 { color: #6366f1 !important; }
+      html.light .text-indigo-300\/60 { color: #6366f1 !important; }
+      html.light .text-indigo-300 { color: #4f46e5 !important; }
+      html.light .bg-indigo-500\/8 { background: rgba(99,102,241,0.08); }
+      /* Stage stepper light */
+      html.light .stage-dot.inactive { background: var(--bg-secondary); color: var(--text-secondary); border-color: var(--border); }
+      html.light .stage-label.inactive { color: var(--text-secondary); }
 
       /* ===== CHAT FLOATING BUTTON ===== */
       .chat-float-btn {
@@ -460,6 +512,7 @@
     <script src="https://unpkg.com/framer-motion@11.0.3/dist/framer-motion.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <!-- Export libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>

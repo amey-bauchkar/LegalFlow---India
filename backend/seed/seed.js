@@ -16,6 +16,17 @@ async function seed() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('Connected to MongoDB.');
 
+    // Only seed if database is empty (preserves signup users)
+    const existingUsers = await User.countDocuments();
+    if (existingUsers > 0) {
+      console.log(`Database already has ${existingUsers} users. Skipping seed to preserve data.`);
+      console.log('Run with --force flag to reset: node seed/seed.js --force');
+      if (!process.argv.includes('--force')) {
+        process.exit(0);
+      }
+      console.log('Force flag detected. Resetting database...');
+    }
+
     // Clear all collections
     await Promise.all([
       User.deleteMany({}),
@@ -30,7 +41,7 @@ async function seed() {
 
     // === USERS ===
     const users = await User.create([
-      { name: 'Rajesh Kumar', email: 'admin@legalflow.in', password: 'admin123', role: 'admin', phone: '+91 98765 00001', designation: 'Senior Partner' },
+      { name: 'Amey Bauchkar', email: 'admin@legalflow.in', password: 'admin123', role: 'admin', phone: '+91 98765 00001', designation: 'Senior Partner' },
       { name: 'Priya Nair', email: 'priya@legalflow.in', password: 'lawyer123', role: 'lawyer', phone: '+91 98765 00002', designation: 'Associate' },
       { name: 'Suresh Iyer', email: 'suresh@legalflow.in', password: 'lawyer123', role: 'lawyer', phone: '+91 98765 00003', designation: 'Senior Associate' },
       { name: 'Meera Desai', email: 'meera@legalflow.in', password: 'lawyer123', role: 'lawyer', phone: '+91 98765 00004', designation: 'Associate' },

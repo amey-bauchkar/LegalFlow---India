@@ -1427,21 +1427,210 @@ const ClientsPage = () => {
 };
 
 // ============================================================
-// SECTION 12: DOCUMENTS
+// SECTION 12: DOCUMENTS (with Upload + Preview)
 // ============================================================
+
+// Document Preview Modal
+const DocumentPreviewModal = ({doc, onClose}) => {
+  if(!doc) return null;
+  const fileUrl = doc.fileUrl || '';
+  const isPdf = fileUrl.toLowerCase().endsWith('.pdf') || (doc.title||'').toLowerCase().endsWith('.pdf');
+  const isImage = /\.(jpg|jpeg|png|gif)$/i.test(fileUrl);
+  const fullUrl = fileUrl.startsWith('/') ? window.location.origin + fileUrl : fileUrl;
+  return React.createElement(motion.div,{
+    className:'fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm',
+    initial:{opacity:0}, animate:{opacity:1}, exit:{opacity:0},
+    onClick:e=>{if(e.target===e.currentTarget) onClose();}
+  },
+    React.createElement(motion.div,{
+      className:'glass-card p-6 w-full max-w-2xl mx-4 max-h-[90vh] flex flex-col',
+      initial:{opacity:0,scale:0.95,y:20}, animate:{opacity:1,scale:1,y:0},
+      transition:{duration:0.35,ease:[0.22,1,0.36,1]},
+      onClick:e=>e.stopPropagation()
+    },
+      React.createElement('div',{className:'relative z-10 flex flex-col h-full'},
+        React.createElement('div',{className:'flex items-center justify-between mb-4'},
+          React.createElement('div',null,
+            React.createElement('h2',{className:'text-lg font-bold text-white tracking-tight'},doc.title||'Document Preview'),
+            React.createElement('div',{className:'flex items-center gap-3 mt-1'},
+              doc.size && React.createElement('span',{className:'text-[11px] text-surface-500'},React.createElement('i',{className:'fas fa-file mr-1'}),doc.size),
+              doc.uploadDate && React.createElement('span',{className:'text-[11px] text-surface-500'},React.createElement('i',{className:'fas fa-calendar mr-1'}),formatDate(doc.uploadDate)),
+              React.createElement(StatusBadge,{status:doc.status||'Uploaded'})
+            )
+          ),
+          React.createElement(motion.div,{className:'w-8 h-8 rounded-lg glass-inner flex items-center justify-center cursor-pointer text-surface-500 hover:text-white transition-colors',
+            onClick:onClose, whileHover:{scale:1.1}, whileTap:{scale:0.9}},
+            React.createElement('i',{className:'fas fa-times text-[12px]'})
+          )
+        ),
+        React.createElement('div',{className:'flex-1 min-h-[300px] glass-inner rounded-xl overflow-hidden flex items-center justify-center'},
+          fileUrl && isPdf ? React.createElement('iframe',{src:fullUrl, className:'w-full h-full min-h-[400px]', title:doc.title}) :
+          fileUrl && isImage ? React.createElement('img',{src:fullUrl, alt:doc.title, className:'max-w-full max-h-[400px] object-contain'}) :
+          React.createElement('div',{className:'text-center p-10'},
+            React.createElement('i',{className:'fas fa-file-alt text-4xl text-surface-600 mb-4 block'}),
+            React.createElement('p',{className:'text-[13px] text-surface-500 mb-2'},'Preview not available for this file type.'),
+            fileUrl && React.createElement('a',{href:fullUrl, target:'_blank', rel:'noopener noreferrer', className:'text-[12px] text-indigo-400 font-semibold hover:text-indigo-300'},
+              React.createElement('i',{className:'fas fa-external-link-alt mr-1'}),'Open File'
+            )
+          )
+        ),
+        fileUrl && React.createElement('div',{className:'mt-3 flex justify-end'},
+          React.createElement('a',{href:fullUrl, target:'_blank', rel:'noopener noreferrer', className:'btn-ghost text-[12px] px-4 py-2 flex items-center gap-2'},
+            React.createElement('i',{className:'fas fa-download text-[10px]'}),'Download'
+          )
+        )
+      )
+    )
+  );
+};
+
+// Document Upload Modal
+const DocumentUploadModal = ({onClose, onUploaded}) => {
+  const [form, setForm] = useState({title:'',type:'',category:'',caseId:''});
+  const [file, setFile] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({});
+  const fileRef = useRef(null);
+
+  const validate = () => {
+    const e = {};
+    if(!form.title.trim()) e.title = 'Title is required';
+    if(!form.caseId) e.caseId = 'Case is required';
+    if(!file) e.file = 'Please select a file';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleFileChange = (e) => {
+    const f = e.target.files[0];
+    if(f) { setFile(f); setFileName(f.name); setErrors(prev=>({...prev,file:undefined})); }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(!validate()) return;
+    setError(''); setUploading(true);
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('title', form.title);
+    fd.append('type', form.type||'Other');
+    fd.append('category', form.category||'General');
+    fd.append('caseId', form.caseId);
+    const res = await window.lfAPI.uploadDocument(fd);
+    if(res.success) {
+      // Add to local docs array
+      documents.push(normalizeRecord(res.data));
+      onUploaded();
+      onClose();
+    } else {
+      setError(res.message||'Upload failed.');
+    }
+    setUploading(false);
+  };
+
+  return React.createElement(motion.div,{
+    className:'fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm',
+    initial:{opacity:0}, animate:{opacity:1}, exit:{opacity:0},
+    onClick:e=>{if(e.target===e.currentTarget) onClose();}
+  },
+    React.createElement(motion.div,{
+      className:'glass-card p-8 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto',
+      initial:{opacity:0,scale:0.95,y:20}, animate:{opacity:1,scale:1,y:0},
+      transition:{duration:0.35,ease:[0.22,1,0.36,1]},
+      onClick:e=>e.stopPropagation()
+    },
+      React.createElement('div',{className:'relative z-10'},
+        React.createElement('div',{className:'flex items-center justify-between mb-6'},
+          React.createElement('h2',{className:'text-xl font-bold text-white tracking-tight'},'Upload Document'),
+          React.createElement(motion.div,{className:'w-8 h-8 rounded-lg glass-inner flex items-center justify-center cursor-pointer text-surface-500 hover:text-white',
+            onClick:onClose, whileHover:{scale:1.1}, whileTap:{scale:0.9}},
+            React.createElement('i',{className:'fas fa-times text-[12px]'})
+          )
+        ),
+        error && React.createElement(motion.div,{className:'mb-4 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[13px]',
+          initial:{opacity:0},animate:{opacity:1}}, React.createElement('i',{className:'fas fa-exclamation-circle mr-2'}),error),
+        React.createElement('form',{onSubmit:handleSubmit,className:'space-y-4'},
+          // File input
+          React.createElement('div',null,
+            React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'File *'),
+            React.createElement('div',{
+              className:`p-4 border-2 border-dashed rounded-xl text-center cursor-pointer transition-colors ${errors.file?'border-red-500/40':'border-white/[0.08] hover:border-indigo-500/30'}`,
+              onClick:()=>fileRef.current.click()
+            },
+              React.createElement('input',{ref:fileRef,type:'file',accept:'.pdf,.doc,.docx,.jpg,.jpeg,.png',className:'hidden',onChange:handleFileChange}),
+              fileName ? React.createElement('div',{className:'flex items-center justify-center gap-2'},
+                React.createElement('i',{className:'fas fa-file-check text-emerald-400'}),
+                React.createElement('span',{className:'text-[13px] text-surface-300 font-medium'},fileName),
+                React.createElement('span',{className:'text-[10px] text-surface-500'},file?`(${(file.size/1024).toFixed(0)} KB)`:'')
+              ) : React.createElement('div',null,
+                React.createElement('i',{className:'fas fa-cloud-upload-alt text-2xl text-surface-600 mb-2 block'}),
+                React.createElement('span',{className:'text-[12px] text-surface-500'},'Click to select PDF, DOC, DOCX, JPG, or PNG')
+              )
+            ),
+            errors.file && React.createElement('span',{className:'text-[11px] text-red-400 mt-1 block'},errors.file)
+          ),
+          // Title
+          React.createElement('div',null,
+            React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'Title *'),
+            React.createElement('input',{type:'text',value:form.title,onChange:e=>{setForm({...form,title:e.target.value});setErrors(prev=>({...prev,title:undefined}));},className:`w-full py-2.5 px-4 rounded-xl text-[13px] ${errors.title?'border-red-500/40':''}`,placeholder:'e.g. Vakalatnama – Supreme Court'}),
+            errors.title && React.createElement('span',{className:'text-[11px] text-red-400 mt-1 block'},errors.title)
+          ),
+          // Case
+          React.createElement('div',null,
+            React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'Case *'),
+            React.createElement('select',{value:form.caseId,onChange:e=>{setForm({...form,caseId:e.target.value});setErrors(prev=>({...prev,caseId:undefined}));},className:`w-full py-2.5 px-4 rounded-xl text-[13px] ${errors.caseId?'border-red-500/40':''}`},
+              React.createElement('option',{value:''},'Select a case...'),
+              cases.map(c=>React.createElement('option',{key:c.id,value:c.id},c.title+' ('+c.caseNumber+')'))
+            ),
+            errors.caseId && React.createElement('span',{className:'text-[11px] text-red-400 mt-1 block'},errors.caseId)
+          ),
+          // Type + Category
+          React.createElement('div',{className:'grid grid-cols-2 gap-4'},
+            React.createElement('div',null,
+              React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'Type'),
+              React.createElement('select',{value:form.type,onChange:e=>setForm({...form,type:e.target.value}),className:'w-full py-2.5 px-4 rounded-xl text-[13px]'},
+                ['','Vakalatnama','Petition','Affidavit','Power of Attorney','Evidence Document','Court Order','Written Statement','GST Filing Attachment','Other'].map(t=>React.createElement('option',{key:t,value:t},t||'Select type...'))
+              )
+            ),
+            React.createElement('div',null,
+              React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'Category'),
+              React.createElement('select',{value:form.category,onChange:e=>setForm({...form,category:e.target.value}),className:'w-full py-2.5 px-4 rounded-xl text-[13px]'},
+                ['','Court Filing','Legal Authority','Evidence','Contract','Tax Document','Identity Document','Property Document','Regulatory','General'].map(c=>React.createElement('option',{key:c,value:c},c||'Select category...'))
+              )
+            )
+          ),
+          // Submit
+          React.createElement('div',{className:'flex items-center gap-3 pt-3'},
+            React.createElement('button',{type:'submit',disabled:uploading,className:`btn-primary py-2.5 px-6 text-[13px] flex-1 ${uploading?'opacity-60 cursor-wait':''}`},
+              uploading ? React.createElement('span',null,React.createElement('i',{className:'fas fa-circle-notch fa-spin mr-2'}),'Uploading...') :
+              React.createElement('span',null,React.createElement('i',{className:'fas fa-upload mr-2'}),'Upload Document')
+            ),
+            React.createElement('button',{type:'button',onClick:onClose,className:'btn-ghost py-2.5 px-6 text-[13px]'},'Cancel')
+          )
+        )
+      )
+    )
+  );
+};
+
 const DocumentsPage = () => {
   const [search,setSearch]=useState('');
   const [tf,setTf]=useState('All');
   const [sf,setSf]=useState('All');
-  const tOpts=useMemo(()=>['All',...new Set(documents.map(d=>d.type))],[]);
-  const sOpts=useMemo(()=>['All',...new Set(documents.map(d=>d.status))],[]);
+  const [showUpload,setShowUpload]=useState(false);
+  const [previewDoc,setPreviewDoc]=useState(null);
+  const [refreshKey,setRefreshKey]=useState(0);
+  const tOpts=useMemo(()=>['All',...new Set(documents.map(d=>d.type))],[refreshKey]);
+  const sOpts=useMemo(()=>['All',...new Set(documents.map(d=>d.status))],[refreshKey]);
   const filtered=useMemo(()=>{
     let r=documents;
     if(tf!=='All') r=r.filter(d=>d.type===tf);
     if(sf!=='All') r=r.filter(d=>d.status===sf);
     if(search){const s=search.toLowerCase(); r=r.filter(d=>d.title.toLowerCase().includes(s)||d.type.toLowerCase().includes(s));}
     return r;
-  },[search,tf,sf]);
+  },[search,tf,sf,refreshKey]);
   const di=(t)=>({'Vakalatnama':'fa-stamp','Power of Attorney':'fa-user-shield','Sale Deed':'fa-home','Rent Agreement':'fa-file-contract','Affidavit':'fa-file-signature','GST Filing Attachment':'fa-receipt','Aadhaar Copy':'fa-id-card','PAN Copy':'fa-id-badge','Written Statement':'fa-file-lines','Petition':'fa-file-alt','Counter Affidavit':'fa-file-shield','Court Order':'fa-gavel','Compliance Report':'fa-clipboard-check','Evidence Document':'fa-folder-open'}[t]||'fa-file');
 
   return React.createElement('div',{className:'space-y-5'},
@@ -1451,7 +1640,11 @@ const DocumentsPage = () => {
         React.createElement('input',{type:'text',placeholder:'Search documents…',className:'w-full pl-8 pr-3 py-[8px] rounded-[11px] text-[13px]',value:search,onChange:e=>setSearch(e.target.value)})
       ),
       React.createElement('select',{className:'rounded-[11px] text-[13px] py-[8px]',value:tf,onChange:e=>setTf(e.target.value)}, tOpts.map(t=>React.createElement('option',{key:t,value:t},t))),
-      React.createElement('select',{className:'rounded-[11px] text-[13px] py-[8px]',value:sf,onChange:e=>setSf(e.target.value)}, sOpts.map(s=>React.createElement('option',{key:s,value:s},s)))
+      React.createElement('select',{className:'rounded-[11px] text-[13px] py-[8px]',value:sf,onChange:e=>setSf(e.target.value)}, sOpts.map(s=>React.createElement('option',{key:s,value:s},s))),
+      React.createElement(motion.div,{role:'button',className:'btn-primary text-[13px] px-4 py-[8px] flex items-center gap-2',onClick:()=>setShowUpload(true),
+        whileHover:{scale:1.03},whileTap:{scale:0.97}},
+        React.createElement('i',{className:'fas fa-upload text-[11px]'}),'Upload'
+      )
     ),
     React.createElement(FadeIn,{delay:0.08,className:'text-[12px] text-surface-500 font-medium'},`${filtered.length} document${filtered.length!==1?'s':''}`),
     React.createElement(FadeUp,{delay:0.12},
@@ -1459,7 +1652,7 @@ const DocumentsPage = () => {
       React.createElement('div',{className:'glass-card-flat overflow-hidden rounded-2xl'}, React.createElement('div',{className:'overflow-x-auto'},
         React.createElement('table',{className:'premium-table'},
           React.createElement('thead',null, React.createElement('tr',null, ['Document','Type','Category','Case','Date','Size','By','Status'].map(h=>React.createElement('th',{key:h},h)))),
-          React.createElement('tbody',null, filtered.map((d,idx)=>{const lc=cases.find(c=>c.id===d.caseId); return React.createElement('tr',{key:d.id},
+          React.createElement('tbody',null, filtered.map((d,idx)=>{const lc=cases.find(c=>c.id===d.caseId); return React.createElement('tr',{key:d.id||idx,className:'cursor-pointer',onClick:()=>setPreviewDoc(d)},
             React.createElement('td',null, React.createElement('div',{className:'flex items-center gap-2.5'}, React.createElement('div',{className:'w-8 h-8 rounded-lg bg-indigo-500/8 flex items-center justify-center flex-shrink-0'}, React.createElement('i',{className:`fas ${di(d.type)} text-indigo-400/70 text-[11px]`})), React.createElement('span',{className:'text-white font-medium truncate max-w-[180px]'},d.title))),
             React.createElement('td',{className:'text-surface-400 whitespace-nowrap'},d.type),
             React.createElement('td',{className:'text-surface-500 whitespace-nowrap'},d.category),
@@ -1471,7 +1664,11 @@ const DocumentsPage = () => {
           );}))
         )
       ))
-    )
+    ),
+    // Upload modal
+    showUpload && React.createElement(DocumentUploadModal,{onClose:()=>setShowUpload(false),onUploaded:()=>setRefreshKey(k=>k+1)}),
+    // Preview modal
+    previewDoc && React.createElement(DocumentPreviewModal,{doc:previewDoc,onClose:()=>setPreviewDoc(null)})
   );
 };
 
@@ -1877,49 +2074,200 @@ const TeamPage = () => {
 // ============================================================
 // SECTION 14.4: REPORTS & ANALYTICS (NEW)
 // ============================================================
+// Chart.js Wrapper Component (uses real Chart.js if available, fallback to BarChart)
+const ChartJSCanvas = ({type, data, options, height=200}) => {
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
+  const isDark = getDarkMode();
+
+  useEffect(()=>{
+    if(!canvasRef.current || typeof Chart === 'undefined') return;
+    if(chartRef.current) chartRef.current.destroy();
+    const ctx = canvasRef.current.getContext('2d');
+    const textColor = isDark ? '#94a3b8' : '#475569';
+    const gridColor = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)';
+    const mergedOpts = {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 1200, easing: 'easeOutQuart' },
+      plugins: { legend: { labels: { color: textColor, font: {family:'Inter',size:11} } } },
+      scales: type !== 'doughnut' && type !== 'pie' ? {
+        x: { ticks: { color: textColor, font:{family:'Inter',size:10} }, grid: { color: gridColor } },
+        y: { ticks: { color: textColor, font:{family:'Inter',size:10} }, grid: { color: gridColor } }
+      } : undefined,
+      ...options
+    };
+    chartRef.current = new Chart(ctx, { type, data, options: mergedOpts });
+    return () => { if(chartRef.current) chartRef.current.destroy(); };
+  },[type,data,options,isDark]);
+
+  if(typeof Chart === 'undefined') return React.createElement('div',{className:'p-6 text-center text-[12px] text-surface-600'},'No data available');
+  return React.createElement('div',{style:{height:height+'px',position:'relative'}},
+    React.createElement('canvas',{ref:canvasRef})
+  );
+};
+
+// Generate Custom Report Modal
+const GenerateReportModal = ({onClose, onGenerated}) => {
+  const [form,setForm] = useState({name:'',type:'Financial',startDate:'',endDate:''});
+  const [errors,setErrors] = useState({});
+  const [generating,setGenerating] = useState(false);
+
+  const validate = () => {
+    const e = {};
+    if(!form.name.trim()) e.name = 'Report name is required';
+    if(!form.startDate) e.startDate = 'Start date is required';
+    if(!form.endDate) e.endDate = 'End date is required';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(!validate()) return;
+    setGenerating(true);
+    // Simulate generation delay
+    await new Promise(r=>setTimeout(r,1500));
+    const report = {
+      id: 'RPT-'+String(Date.now()).slice(-3),
+      name: form.name,
+      type: form.type,
+      date: new Date().toISOString().slice(0,10),
+      author: getUserName() || 'System',
+      size: (Math.random()*3+0.5).toFixed(1)+' MB'
+    };
+    onGenerated(report);
+    setGenerating(false);
+    onClose();
+  };
+
+  return React.createElement(motion.div,{
+    className:'fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm',
+    initial:{opacity:0},animate:{opacity:1},exit:{opacity:0},
+    onClick:e=>{if(e.target===e.currentTarget) onClose();}
+  },
+    React.createElement(motion.div,{
+      className:'glass-card p-8 w-full max-w-md mx-4',
+      initial:{opacity:0,scale:0.95,y:20},animate:{opacity:1,scale:1,y:0},
+      transition:{duration:0.35,ease:[0.22,1,0.36,1]},
+      onClick:e=>e.stopPropagation()
+    },
+      React.createElement('div',{className:'relative z-10'},
+        React.createElement('div',{className:'flex items-center justify-between mb-6'},
+          React.createElement('h2',{className:'text-xl font-bold text-white tracking-tight'},'Generate Custom Report'),
+          React.createElement(motion.div,{className:'w-8 h-8 rounded-lg glass-inner flex items-center justify-center cursor-pointer text-surface-500 hover:text-white',
+            onClick:onClose,whileHover:{scale:1.1},whileTap:{scale:0.9}},
+            React.createElement('i',{className:'fas fa-times text-[12px]'})
+          )
+        ),
+        React.createElement('form',{onSubmit:handleSubmit,className:'space-y-4'},
+          React.createElement('div',null,
+            React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'Report Name *'),
+            React.createElement('input',{type:'text',value:form.name,onChange:e=>{setForm({...form,name:e.target.value});setErrors(prev=>({...prev,name:undefined}));},className:`w-full py-2.5 px-4 rounded-xl text-[13px] ${errors.name?'border-red-500/40':''}`,placeholder:'e.g. Q2 Financial Summary'}),
+            errors.name && React.createElement('span',{className:'text-[11px] text-red-400 mt-1 block'},errors.name)
+          ),
+          React.createElement('div',null,
+            React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'Report Type'),
+            React.createElement('select',{value:form.type,onChange:e=>setForm({...form,type:e.target.value}),className:'w-full py-2.5 px-4 rounded-xl text-[13px]'},
+              ['Financial','Performance','Custom'].map(t=>React.createElement('option',{key:t,value:t},t))
+            )
+          ),
+          React.createElement('div',{className:'grid grid-cols-2 gap-4'},
+            React.createElement('div',null,
+              React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'Start Date *'),
+              React.createElement('input',{type:'date',value:form.startDate,onChange:e=>{setForm({...form,startDate:e.target.value});setErrors(prev=>({...prev,startDate:undefined}));},className:`w-full py-2.5 px-4 rounded-xl text-[13px] ${errors.startDate?'border-red-500/40':''}`}),
+              errors.startDate && React.createElement('span',{className:'text-[11px] text-red-400 mt-1 block'},errors.startDate)
+            ),
+            React.createElement('div',null,
+              React.createElement('label',{className:'block text-[11px] font-semibold text-surface-400 uppercase tracking-wider mb-1.5'},'End Date *'),
+              React.createElement('input',{type:'date',value:form.endDate,onChange:e=>{setForm({...form,endDate:e.target.value});setErrors(prev=>({...prev,endDate:undefined}));},className:`w-full py-2.5 px-4 rounded-xl text-[13px] ${errors.endDate?'border-red-500/40':''}`}),
+              errors.endDate && React.createElement('span',{className:'text-[11px] text-red-400 mt-1 block'},errors.endDate)
+            )
+          ),
+          React.createElement('div',{className:'flex items-center gap-3 pt-3'},
+            React.createElement('button',{type:'submit',disabled:generating,className:`btn-primary py-2.5 px-6 text-[13px] flex-1 ${generating?'opacity-60 cursor-wait':''}`},
+              generating ? React.createElement('span',null,React.createElement('i',{className:'fas fa-circle-notch fa-spin mr-2'}),'Generating...') :
+              React.createElement('span',null,React.createElement('i',{className:'fas fa-wand-magic-sparkles mr-2'}),'Generate Report')
+            ),
+            React.createElement('button',{type:'button',onClick:onClose,className:'btn-ghost py-2.5 px-6 text-[13px]'},'Cancel')
+          )
+        )
+      )
+    )
+  );
+};
+
 const ReportsPage = () => {
-  // Dummy data for charts
-  const revenueTrend = [
-    { label: 'Nov', value: 980000, color: 'linear-gradient(to top, rgba(99,102,241,0.5), rgba(129,140,248,0.8))' },
-    { label: 'Dec', value: 1550000, color: 'linear-gradient(to top, rgba(99,102,241,0.5), rgba(129,140,248,0.8))' },
-    { label: 'Jan', value: 890000, color: 'linear-gradient(to top, rgba(99,102,241,0.5), rgba(129,140,248,0.8))' },
-    { label: 'Feb', value: 1320000, color: 'linear-gradient(to top, rgba(99,102,241,0.5), rgba(129,140,248,0.8))' },
-    { label: 'Mar', value: 1650000, color: 'linear-gradient(to top, rgba(99,102,241,0.5), rgba(129,140,248,0.8))' },
-    { label: 'Apr', value: 2100000, color: 'linear-gradient(to top, rgba(52,211,153,0.6), rgba(110,231,183,0.9))' } // Projected/Current
-  ];
-
-  const caseDistribution = [
-    { label: 'Corporate', value: 35, color: 'linear-gradient(to top, rgba(168,85,247,0.5), rgba(192,132,252,0.8))' },
-    { label: 'Litigation', value: 45, color: 'linear-gradient(to top, rgba(239,68,68,0.5), rgba(248,113,113,0.8))' },
-    { label: 'IPR', value: 15, color: 'linear-gradient(to top, rgba(59,130,246,0.5), rgba(96,165,250,0.8))' },
-    { label: 'Tax', value: 25, color: 'linear-gradient(to top, rgba(245,158,11,0.5), rgba(251,191,36,0.8))' },
-    { label: 'Real Estate', value: 10, color: 'linear-gradient(to top, rgba(16,185,129,0.5), rgba(52,211,153,0.8))' }
-  ];
-
-  const generatedReports = [
-    { id: 'RPT-001', name: 'Q1 Financial Summary 2026', type: 'Financial', date: '2026-04-01', size: '2.4 MB', author: 'Rajesh Kumar' },
+  const [showGenerate, setShowGenerate] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+  const [savedReports, setSavedReports] = useState([
+    { id: 'RPT-001', name: 'Q1 Financial Summary 2026', type: 'Financial', date: '2026-04-01', size: '2.4 MB', author: 'Amey Bauchkar' },
     { id: 'RPT-002', name: 'Associate Utilization Report - March', type: 'Performance', date: '2026-04-02', size: '1.1 MB', author: 'System Auto' },
     { id: 'RPT-003', name: 'Active Litigation Pipeline', type: 'Case Management', date: '2026-04-03', size: '3.5 MB', author: 'Priya Nair' },
     { id: 'RPT-004', name: 'Outstanding Receivables Ledger', type: 'Billing', date: '2026-04-05', size: '850 KB', author: 'System Auto' }
-  ];
+  ]);
+
+  const handleGenerated = (report) => {
+    setSavedReports(prev=>[report,...prev]);
+    setSuccessMsg(`Report "${report.name}" generated successfully!`);
+    setTimeout(()=>setSuccessMsg(''),4000);
+  };
+
+  // Revenue chart data (required format)
+  const revenueChartData = useMemo(()=>({
+    labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets: [{
+      label: 'Revenue (\u20b9)',
+      data: [1200000, 980000, 1500000, 1300000, 1700000, 1600000],
+      backgroundColor: ['rgba(99,102,241,0.7)','rgba(99,102,241,0.7)','rgba(99,102,241,0.7)','rgba(99,102,241,0.7)','rgba(99,102,241,0.7)','rgba(99,102,241,0.7)'],
+      borderColor: 'rgba(129,140,248,1)',
+      borderWidth: 1, borderRadius: 6, borderSkipped: false
+    }]
+  }),[]);
+
+  // Practice Areas chart data (required format)
+  const practiceChartData = useMemo(()=>({
+    labels: ['Corporate','Litigation','Tax','IP'],
+    datasets: [{
+      label: 'Cases',
+      data: [12, 8, 5, 3],
+      backgroundColor: ['rgba(129,140,248,0.8)','rgba(248,113,113,0.8)','rgba(251,191,36,0.8)','rgba(96,165,250,0.8)'],
+      borderWidth: 0, borderRadius: 6, borderSkipped: false
+    }]
+  }),[]);
+
+  const revenueOpts = useMemo(()=>({
+    plugins: { legend:{display:false}, tooltip:{callbacks:{label:function(ctx){return '\u20b9'+ctx.raw.toLocaleString('en-IN')}}} },
+    scales: { y:{beginAtZero:true, ticks:{callback:function(v){return '\u20b9'+(v/100000).toFixed(0)+'L'}}} }
+  }),[]);
+
+  const practiceOpts = useMemo(()=>({
+    plugins: { legend:{display:false} },
+    scales: { y:{beginAtZero:true, ticks:{stepSize:1}} }
+  }),[]);
 
   return React.createElement('div', { className: 'space-y-6' },
+    // Success message
+    successMsg && React.createElement(motion.div,{
+      className:'px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[13px] font-medium flex items-center gap-2',
+      initial:{opacity:0,y:-10},animate:{opacity:1,y:0},exit:{opacity:0}
+    }, React.createElement('i',{className:'fas fa-check-circle'}), successMsg),
+
     // Top Controls
     React.createElement(FadeUp, { className: 'flex justify-between items-center flex-wrap gap-4' },
       React.createElement('div', { className: 'flex items-center gap-3' },
         React.createElement('div', { className: 'relative' },
-          React.createElement('select', { className: 'appearance-none bg-surface-900/60 border border-white/[0.05] text-white pl-4 pr-10 py-2 rounded-xl text-[13px] outline-none cursor-pointer hover:border-indigo-500/30 transition-colors' },
+          React.createElement('select', { className: 'appearance-none rounded-xl text-[13px] py-2 pl-4 pr-10 cursor-pointer' },
             React.createElement('option', null, 'This Quarter (Q2 2026)'),
             React.createElement('option', null, 'Last Quarter (Q1 2026)'),
-            React.createElement('option', null, 'Year to Date (YTD)'),
-            React.createElement('option', null, 'Custom Range...')
+            React.createElement('option', null, 'Year to Date (YTD)')
           ),
           React.createElement('i', { className: 'fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-[10px] text-surface-500 pointer-events-none' })
         )
       ),
       React.createElement('div', { className: 'flex items-center gap-3' },
-        React.createElement('button', { className: 'btn-ghost' }, React.createElement('i', { className: 'fas fa-print mr-2' }), 'Print'),
-        React.createElement('button', { className: 'btn-primary' }, React.createElement('i', { className: 'fas fa-wand-magic-sparkles mr-2' }), 'Generate Custom Report')
+        React.createElement('button', { className: 'btn-ghost', onClick:()=>window.print() }, React.createElement('i', { className: 'fas fa-print mr-2' }), 'Print'),
+        React.createElement(motion.div, { role:'button', className: 'btn-primary flex items-center gap-2', onClick:()=>setShowGenerate(true),
+          whileHover:{scale:1.03},whileTap:{scale:0.97} }, React.createElement('i', { className: 'fas fa-wand-magic-sparkles' }), 'Generate Custom Report')
       )
     ),
 
@@ -1931,33 +2279,25 @@ const ReportsPage = () => {
       React.createElement(MetricCard, { icon: 'fa-hand-holding-dollar', iconBg: 'bg-amber-500/10 text-amber-400', label: 'Realization Rate', value: 91, suffix: '%', trend: '-2% vs Target', trendUp: false, delay: 0.25 })
     ),
 
-    // Charts Section
+    // Charts Section (Chart.js)
     React.createElement(FadeUp, { delay: 0.35, className: 'grid grid-cols-1 lg:grid-cols-2 gap-4' },
-      // Revenue Chart
       React.createElement('div', { className: 'glass-card-flat p-6 rounded-2xl' },
-        React.createElement('div', { className: 'flex items-center justify-between mb-6' },
+        React.createElement('div', { className: 'flex items-center justify-between mb-4' },
           React.createElement('div', null,
-            React.createElement('h3', { className: 'text-[14px] font-semibold text-white' }, 'Revenue Trajectory'),
-            React.createElement('span', { className: 'text-[11px] text-surface-500' }, 'Actuals vs Projected (Apr)')
-          ),
-          React.createElement('button', { className: 'text-[11px] text-indigo-400 hover:text-indigo-300 font-medium transition-colors' }, 'View Ledger')
-        ),
-        React.createElement('div', { className: 'mt-4' },
-          React.createElement(BarChart, { data: revenueTrend, height: 160 })
-        )
-      ),
-      
-      // Case Distribution Chart
-      React.createElement('div', { className: 'glass-card-flat p-6 rounded-2xl' },
-        React.createElement('div', { className: 'flex items-center justify-between mb-6' },
-          React.createElement('div', null,
-            React.createElement('h3', { className: 'text-[14px] font-semibold text-white' }, 'Practice Area Distribution'),
-            React.createElement('span', { className: 'text-[11px] text-surface-500' }, 'Active caseload by sector')
+            React.createElement('h3', { className: 'text-[14px] font-semibold text-white' }, 'Revenue'),
+            React.createElement('span', { className: 'text-[11px] text-surface-500' }, 'Monthly revenue trend')
           )
         ),
-        React.createElement('div', { className: 'mt-4' },
-          React.createElement(BarChart, { data: caseDistribution, height: 160 })
-        )
+        React.createElement(ChartJSCanvas, { type:'bar', data:revenueChartData, options:revenueOpts, height:220 })
+      ),
+      React.createElement('div', { className: 'glass-card-flat p-6 rounded-2xl' },
+        React.createElement('div', { className: 'flex items-center justify-between mb-4' },
+          React.createElement('div', null,
+            React.createElement('h3', { className: 'text-[14px] font-semibold text-white' }, 'Practice Areas'),
+            React.createElement('span', { className: 'text-[11px] text-surface-500' }, 'Case count by practice area')
+          )
+        ),
+        React.createElement(ChartJSCanvas, { type:'bar', data:practiceChartData, options:practiceOpts, height:220 })
       )
     ),
 
@@ -1966,12 +2306,12 @@ const ReportsPage = () => {
       React.createElement('div', { className: 'glass-card-flat overflow-hidden rounded-2xl' },
         React.createElement('div', { className: 'px-6 py-5 border-b border-white/[0.03] flex justify-between items-center' },
           React.createElement('h3', { className: 'text-[14px] font-semibold text-white' }, 'Saved Reports & Exports'),
-          React.createElement('button', { className: 'text-[11px] text-indigo-400 font-medium' }, 'View Archive')
+          React.createElement('span', { className: 'text-[11px] text-surface-500 font-medium' }, `${savedReports.length} reports`)
         ),
         React.createElement('div', { className: 'overflow-x-auto' },
           React.createElement('table', { className: 'premium-table' },
             React.createElement('thead', null, React.createElement('tr', null, ['Report Name', 'Type', 'Generated On', 'Author', 'Size', 'Action'].map(h => React.createElement('th', { key: h }, h)))),
-            React.createElement('tbody', null, generatedReports.map(rpt => React.createElement('tr', { key: rpt.id, className: 'group' },
+            React.createElement('tbody', null, savedReports.map(rpt => React.createElement('tr', { key: rpt.id, className: 'group' },
               React.createElement('td', null, 
                 React.createElement('div', { className: 'flex items-center gap-3' },
                   React.createElement('div', { className: 'w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center' },
@@ -1994,7 +2334,9 @@ const ReportsPage = () => {
           )
         )
       )
-    )
+    ),
+    // Generate Report Modal
+    showGenerate && React.createElement(GenerateReportModal, {onClose:()=>setShowGenerate(false), onGenerated:handleGenerated})
   );
 };
 // ============================================================
